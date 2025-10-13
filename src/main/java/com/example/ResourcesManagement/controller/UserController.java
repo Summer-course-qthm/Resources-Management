@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -32,8 +33,8 @@ public class UserController {
 
     // admin
     @GetMapping("/user/listUser")
-    public ResponseEntity<ArrayList<UserResponseDTO>> getListUser() {
-        ArrayList<UserResponseDTO> listUser = userService.getListUser();
+    public ResponseEntity<List<UserResponseDTO>> getListUser() {
+        List<UserResponseDTO> listUser = userService.getListUser();
         return ResponseEntity.ok(listUser);
     }
 

@@ -8,14 +8,22 @@ import com.example.ResourcesManagement.entity.UserEntity;
 import com.example.ResourcesManagement.repository.ChapterRepository;
 import com.example.ResourcesManagement.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService { // <-- THAY ĐỔI 1: implements UserDetailsService
 
     @Autowired
     UserRepository userRepository;
@@ -30,73 +38,61 @@ public class UserService {
     private ChapterRepository chapterRepository;
 
     public String  createUser(CreateUserRequestDTO createUserRequestDTO) {
-        // kiểm tra user tồn tại chưa
         if (userRepository.findByUsername(createUserRequestDTO.getUsername()).isPresent()) {
             throw new RuntimeException("Username already exists");
         }
 
-        //tạo user mới
         UserEntity user = new UserEntity();
         user.setUsername(createUserRequestDTO.getUsername());
-        user.setPassword(passwordEncoder.encode(createUserRequestDTO.getPassword())); //mã hóa password
-        user.setRole("USER");
+        user.setPassword(passwordEncoder.encode(createUserRequestDTO.getPassword()));
+        user.setRole("USER"); // Mặc định role là USER
         user.setPhone(createUserRequestDTO.getPhone());
         user.setEmail(createUserRequestDTO.getEmail());
-        // lấy chapter ừ repository
+
         ChapterEntity cha = chapterRepository.findById(createUserRequestDTO.getChapterId())
                 .orElseThrow(() -> new RuntimeException("Chapter not found"));
         user.setChapter(cha);
-        //lưu
+
         userRepository.save(user);
         return "Register successful";
     }
 
 
     public String login(LoginResquestDTO request) {
-        // kiem tra username va password
-        // kiểm tra user có tồn tại hay kh
         UserEntity user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));
 
-        // pass của 'user' -> ở trong db đã được encode(password: àashfdjgjksaf)
-        // cầm password 'thiệt' mà user input, dùng hàm so với cái đã encode trong db
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid username or password");
         }
 
-        //tạo token và return
+        // Tạo token và return
         return jwtService.generateToken(user.getUsername());
-
-
-
     }
 
-    public ArrayList<UserResponseDTO> getListUser() {
-        ArrayList<UserEntity> listUser = (ArrayList<UserEntity>) userRepository.findAll();
-        ArrayList<UserResponseDTO> listUserResponse = new ArrayList<>();
-        for (UserEntity user : listUser) {
-            UserResponseDTO userResponseDTO = new UserResponseDTO();
-            userResponseDTO.setId(user.getId());
-            userResponseDTO.setUsername(user.getUsername());
-            userResponseDTO.setChapterName(user.getChapter().getName());
-
-            listUserResponse.add(userResponseDTO);
-        }
-        return listUserResponse;
+    public List<UserResponseDTO> getListUser() {
+        return userRepository.findAll().stream()
+                .map(user -> {
+                    UserResponseDTO dto = new UserResponseDTO();
+                    dto.setId(user.getId());
+                    dto.setUsername(user.getUsername());
+                    if (user.getChapter() != null) {
+                        dto.setChapterName(user.getChapter().getName());
+                    } else {
+                        dto.setChapterName("N/A");
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     public void deleteUser(Long id) {
-        // Bước 1: Kiểm tra xem ID có bị null không
         if (id == null) {
             throw new IllegalArgumentException("User ID must not be null");
         }
-
-        // Bước 2: Kiểm tra xem user có thực sự tồn tại trong database không
         if (!userRepository.existsById(id)) {
             throw new RuntimeException("User not found with id: " + id);
         }
-
-        // Bước 3: Nếu mọi thứ đều ổn, tiến hành xóa
         userRepository.deleteById(id);
     }
 
@@ -116,5 +112,22 @@ public class UserService {
         user.setChapter(chapter);
 
         userRepository.save(user);
+    }
+
+    // THAY ĐỔI 2: Thêm phương thức bắt buộc của UserDetailsService
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // Tìm kiếm user trong CSDL bằng username
+        UserEntity userEntity = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng với username: " + username));
+
+        // Tạo một đối tượng UserDetails từ UserEntity
+        // Spring Security sẽ sử dụng thông tin này để xác thực và phân quyền
+        return new User(
+                userEntity.getUsername(),
+                userEntity.getPassword(),
+                // Chuyển đổi role (String) của bạn thành GrantedAuthority
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + userEntity.getRole()))
+        );
     }
 }

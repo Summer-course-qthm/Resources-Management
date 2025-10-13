@@ -9,6 +9,8 @@ import lombok.*;
 @Builder
 public class ResquestResquestDTO {
     private Long userId;
+    private String type;
+    private String description;
     private Long deviceId;
 
 
