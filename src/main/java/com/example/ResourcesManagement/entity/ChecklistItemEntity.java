@@ -21,6 +21,7 @@ public class ChecklistItemEntity {
     private String itemDescription;
 
     // Nhiều mục con thuộc về một Checklist
+
     @ManyToOne
     @JoinColumn(name = "checklist_id")
     private ChecklistEntity checklist;

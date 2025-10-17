@@ -53,4 +53,19 @@ public class UserController {
         // viết tường minh
         //return ResponseEntity.status(200).body("Update successfully");
     }
+
+    //xóa user khỏi chapter( dùng PUT bên user cập nhập chapterId = null)
+    @PutMapping("/user/removeFromChapter/{id}")
+    public ResponseEntity<String> removeUserFromChapter(@PathVariable Long id) {
+        userService.removeUserFromChapter(id);
+        return ResponseEntity.ok("User removed from chapter successfully");
+    }
+
+    // laays user theo chapter
+
+    @GetMapping("/users/byChapter/{chapterId}")
+    public ResponseEntity<List<UserResponseDTO>> getUsersByChapter(@PathVariable Long chapterId) {
+        List<UserResponseDTO> users = userService.getUsersByChapter(chapterId);
+        return ResponseEntity.ok(users);
+    }
 }

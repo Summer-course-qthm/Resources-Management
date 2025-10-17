@@ -4,7 +4,7 @@ import com.example.ResourcesManagement.utils.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod; // <-- Nhớ thêm import này
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -32,19 +32,37 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Các API công khai
+                        // === 1. API CÔNG KHAI (Không cần đăng nhập) ===
                         .requestMatchers("/register", "/login").permitAll()
 
-                        // 2. THÊM LẠI CÁC QUY TẮC PHÂN QUYỀN CHI TIẾT Ở ĐÂY
+                        // === 2. API CHỈ DÀNH CHO ADMIN ===
+                        // Quản lý User
                         .requestMatchers(HttpMethod.GET, "/user/listUser").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/user/delete/**").hasRole("ADMIN")
-                        // ... Bạn có thể thêm các quy tắc khác cho ADMIN ở đây ...
+                        .requestMatchers(HttpMethod.PUT, "/user/update/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/user/removeFromChapter/**").hasRole("ADMIN")
+                        // Quản lý Device
+                        .requestMatchers(HttpMethod.POST, "/devices").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/devices/**").hasRole("ADMIN")
+                        // Quản lý Chapter
+                        .requestMatchers(HttpMethod.PUT, "/chapter/update/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/chapter/delete/**").hasRole("ADMIN")
+                        // Quản lý Checklist
+                        .requestMatchers(HttpMethod.POST, "/checklist", "/checkListItem").hasRole("ADMIN")
+                        // Quản lý Request (xử lý yêu cầu)
+                        .requestMatchers(HttpMethod.PUT, "/check-stock").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/request-device").hasRole("ADMIN")
 
-                        // 3. Các API yêu cầu đăng nhập (bất kể vai trò)
-                        // Ví dụ: Cả USER và ADMIN đều có thể xem chapters
-                        .requestMatchers(HttpMethod.GET, "/chapters").authenticated()
+                        // === 3. API DÀNH CHO USER (Admin không dùng) ===
+                        // User gửi yêu cầu mượn thiết bị
+                        .requestMatchers(HttpMethod.POST, "/request-device").hasRole("USER")
 
-                        // 4. Quy tắc cuối cùng: Các request còn lại cũng cần xác thực
+                        // === 4. API DÙNG CHUNG (Cần đăng nhập, bất kể vai trò) ===
+                        .requestMatchers(HttpMethod.GET, "/devices", "/chapters", "/users/byChapter/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/devices/user/**").authenticated()
+
+                        // === 5. QUY TẮC CUỐI CÙNG ===
+                        // Bất kỳ request nào khác chưa được định nghĩa ở trên đều yêu cầu phải xác thực
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
@@ -53,7 +71,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ... các Bean còn lại giữ nguyên ...
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

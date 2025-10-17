@@ -7,10 +7,11 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CheckListRequestDTO {
-    private Long userId;
-    private String name;
+    private String useName; // người tạo checklist
+    private String title;
     private String description;
     private Long deviceId;
+
 
 
 }

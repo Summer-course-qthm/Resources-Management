@@ -130,4 +130,35 @@ public class UserService implements UserDetailsService { // <-- THAY ĐỔI 1: i
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + userEntity.getRole()))
         );
     }
+
+    // Xóa user khỏi chapter (cập nhật chapterId = null)
+    public void removeUserFromChapter(Long id) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setChapter(null); // Cập nhật chapterId thành null
+        userRepository.save(user);
+    }
+
+    // lấy user theo chapter
+    public List<UserResponseDTO> getUsersByChapter(Long chapterId) {
+        ChapterEntity chapter = chapterRepository.findById(chapterId)
+                .orElseThrow(() -> new RuntimeException("Chapter not found"));
+
+        List<UserEntity> users = userRepository.findByChapter(chapter);
+
+        List<UserResponseDTO> userDTOs = new ArrayList<>();
+        for (UserEntity user : users) {
+            UserResponseDTO dto = new UserResponseDTO();
+            dto.setId(user.getId());
+            dto.setUsername(user.getUsername());
+            if (user.getChapter() != null) {
+                dto.setChapterName(user.getChapter().getName());
+            } else {
+                dto.setChapterName("N/A");
+            }
+            userDTOs.add(dto);
+        }
+        return userDTOs;
+    }
 }

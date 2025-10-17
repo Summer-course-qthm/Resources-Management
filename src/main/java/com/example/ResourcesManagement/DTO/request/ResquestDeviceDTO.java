@@ -7,11 +7,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ResquestResquestDTO {
-    private Long userId;
-    private String type;
+public class ResquestDeviceDTO {
+    private Long userId; // người tạo request
+    private String DeviceType; // loại thiết bị cần mượn
     private String description;
-    private Long deviceId;
 
 
 }

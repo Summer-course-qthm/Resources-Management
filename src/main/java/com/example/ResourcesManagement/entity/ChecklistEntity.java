@@ -17,9 +17,9 @@ public class ChecklistEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "checklist_id")
     private Long checklistId;
-
     private String title;
     private String content;
+    private Long createdCheckList; // người tạo checklist
 
     // Một Checklist có nhiều mục con (Checklist_Items)
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)

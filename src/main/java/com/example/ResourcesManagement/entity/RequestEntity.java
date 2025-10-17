@@ -17,17 +17,18 @@ public class RequestEntity {
     @Column(name = "request_id")
     private Long requestId;
 
-    private String type;
+    private String deviceType;
     private String description;
     private String status;
+    private  String nameDevice;
 
     // Nhiều request được tạo bởi một User
     @ManyToOne
     @JoinColumn(name = "request_user_id")
-    private UserEntity requestingUser;
+    private UserEntity requestingUser; // người tạo request
 
     // Nhiều request được duyệt bởi một User
     @ManyToOne
     @JoinColumn(name = "approve_user_id" )
-    private UserEntity approvingUser;
+    private UserEntity approvingUser; // người duyệt request
 }
