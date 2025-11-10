@@ -36,6 +36,7 @@ public class RequestDeviceService {
                 .build();
 
         requetsRepository.save(requestEntity);
+        System.out.println("Request saved: " + requestEntity);
         return "Request added successfully";
 
 
@@ -70,54 +71,74 @@ public class RequestDeviceService {
 
 
 
-    public String checkStock( RequestResponseDTO requestResponseDTO) { // userId người gửi request,
+    public String checkStock( Long  requestId , Long userId) { // userId người duyệt request,
 
         // KIỂM TRA type có tồn tại với userid null hoặc status available không
+        RequestEntity requestEntity = requetsRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+        String deviceType = requestEntity.getDeviceType();
          boolean hasDeviceAvailable = deviceRepository.existsByStatusAndDeviceType(
-                requestResponseDTO.getDeviceType(), "available"
+                 "available" ,deviceType
         );
+         System.out.println(hasDeviceAvailable);
         // nếu biến kiểm tra null hoặc rỗng từ chối request
         if (!hasDeviceAvailable ) {
             // không có thiết bị nào phù hợp
             // cập nhật trạng thái request thành REJECTED
-            RequestEntity requestEntity = requetsRepository.findById(requestResponseDTO.getRequestId())
-                    .orElseThrow(() -> new RuntimeException("Request not found"));
             requestEntity.setStatus("REJECTED"); // từ chối request
             requetsRepository.save(requestEntity);
             return "No available device found. Request rejected.";
         }
 
         // kiểm tra user có mượn thiết bị nào chưa chưa && type có tồn tại
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        boolean userHasDeviceType = requetsRepository.existsByDeviceTypeAndRequestingUser(deviceType, requestEntity.getRequestingUser() );
 
 
-        boolean userHasDeviceType = deviceRepository.existsByAssignedUserIdAndDeviceTypeAndStatus(
-                requestResponseDTO.getUser().getId(),
-                requestResponseDTO.getDeviceType(),
-                "assigned"
-        );
-
+        System.out.println(userHasDeviceType);
         if (userHasDeviceType) {
             // user đã mượn thiết bị cùng loại
             // cập nhật trạng thái request thành REJECTED
-            RequestEntity requestEntity = requetsRepository.findById(requestResponseDTO.getRequestId())
-                    .orElseThrow(() -> new RuntimeException("Request not found"));
             requestEntity.setStatus("REJECTED"); // từ chối request
+            requestEntity.setApprovingUser(userEntity);
             requetsRepository.save(requestEntity);
             return "User has already borrowed a device of this type. Request rejected.";
         }
 
 
         // bàn giao thiết bị là gắn thiết bị cho user mà gửi request
-        RequestEntity requestEntity = requetsRepository.findById(requestResponseDTO.getRequestId())
-                .orElseThrow(() -> new RuntimeException("Request not found"));
-        UserEntity user = userRepository.findById(requestResponseDTO.getUser().getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+
         // cập nhật trạng thái request thành APPROVED
         requestEntity.setStatus("APPROVED");
-        requestEntity.setApprovingUser(user); // người duyệt request
+        requestEntity.setApprovingUser(userEntity); // người duyệt request
         requetsRepository.save(requestEntity);
         return "Request approved and device assigned successfully.";
 
 
+    }
+
+    public void deleteRequest(Long id) {
+        RequestEntity requestEntity = requetsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+        requetsRepository.delete(requestEntity);
+    }
+
+    //  trả thiết bị
+    public String returnDevice(Long deviceId, Long userId) {
+        DevicesEntity device = deviceRepository.findById(deviceId)
+                .orElseThrow(() -> new RuntimeException("Device not found"));
+
+        // kiểm tra thiết bị có được đúng người đó mượn không
+        if (device.getAssignedUser() == null || !device.getAssignedUser().getId().equals(userId)) {
+            return "Device is not assigned to this user.";
+        }
+
+        // cập nhật trạng thái thiết bị thành available và bỏ gán user
+        device.setStatus("available");
+        device.setAssignedUser(null);
+        deviceRepository.save(device);
+
+        return "Device returned successfully.";
     }
 }

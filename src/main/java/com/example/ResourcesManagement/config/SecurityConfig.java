@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // === 1. API CÔNG KHAI (Không cần đăng nhập) ===
-                        .requestMatchers("/register", "/login").permitAll()
+                        .requestMatchers("/register", "/login","/test","/viewDevices","/viewRegister").permitAll()
 
                         // === 2. API CHỈ DÀNH CHO ADMIN ===
                         // Quản lý User
@@ -44,14 +44,17 @@ public class SecurityConfig {
                         // Quản lý Device
                         .requestMatchers(HttpMethod.POST, "/devices").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/devices/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/devices/**").hasRole("ADMIN")
                         // Quản lý Chapter
                         .requestMatchers(HttpMethod.PUT, "/chapter/update/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/chapter/delete/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/chapter/transferUsers").hasRole("ADMIN")
                         // Quản lý Checklist
                         .requestMatchers(HttpMethod.POST, "/checklist", "/checkListItem").hasRole("ADMIN")
                         // Quản lý Request (xử lý yêu cầu)
                         .requestMatchers(HttpMethod.PUT, "/check-stock").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/request-device").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/request-device/**").hasRole("ADMIN")
 
                         // === 3. API DÀNH CHO USER (Admin không dùng) ===
                         // User gửi yêu cầu mượn thiết bị
@@ -60,6 +63,8 @@ public class SecurityConfig {
                         // === 4. API DÙNG CHUNG (Cần đăng nhập, bất kể vai trò) ===
                         .requestMatchers(HttpMethod.GET, "/devices", "/chapters", "/users/byChapter/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/devices/user/**").authenticated()
+
+
 
                         // === 5. QUY TẮC CUỐI CÙNG ===
                         // Bất kỳ request nào khác chưa được định nghĩa ở trên đều yêu cầu phải xác thực

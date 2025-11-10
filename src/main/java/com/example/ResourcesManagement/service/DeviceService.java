@@ -34,6 +34,7 @@ public class DeviceService {
         return entities.stream().map( device -> DeviceResponseDTO.builder()
                 .name(device.getDeviceName())
                 .status(device.getStatus())
+                .type(device.getDeviceType())
                 .assignedUser(device.getAssignedUser() != null ? device.getAssignedUser().getUsername() : "Unassigned")
                 .build()).collect(Collectors.toList());
     }
@@ -46,6 +47,7 @@ public class DeviceService {
                 .deviceName(createDeviceRequestDTO.getDeviceName())
                 .status(createDeviceRequestDTO.getStatus())
                 .note(createDeviceRequestDTO.getNote())
+                .deviceType(createDeviceRequestDTO.getDeviceType())
                 .isChecked(false) // Mặc định là chưa kiểm tra
                 .checklist(null)
                 .build();
@@ -75,6 +77,13 @@ public class DeviceService {
                         .status(device.getStatus())
                         .assignedUser(device.getAssignedUser() != null ? device.getAssignedUser().getUsername() : "Unassigned")
                         .build()).toList();
+
+    }
+
+    public void deleteDevice(Long id) {
+        DevicesEntity device = deviceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Device not found"));
+        deviceRepository.delete(device);
 
     }
 }

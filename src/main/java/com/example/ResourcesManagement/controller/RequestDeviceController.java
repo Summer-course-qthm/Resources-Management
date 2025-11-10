@@ -23,9 +23,9 @@ public class RequestDeviceController {
 
     // admin bắt đầu xử lý yêu cầu (chấp nhận hoặc từ chối)
     @PutMapping ("/check-stock")
-    public ResponseEntity<String> checkRequest(@RequestBody RequestResponseDTO requestResponseDTO) {
-      String statusRequest = requestDeviceService.checkStock(requestResponseDTO);
-       return ResponseEntity.ok().body("Request processed successfully");
+    public ResponseEntity<String> checkRequest(@RequestParam Long requestId, @RequestParam Long userId) {
+      String statusRequest = requestDeviceService.checkStock(requestId, userId);
+       return ResponseEntity.ok().body(statusRequest);
     }
 
     // lấy hết request
@@ -35,8 +35,19 @@ public class RequestDeviceController {
         return ResponseEntity.ok().body(ListRequest);
     }
 
+    // xóa request
+    @DeleteMapping ("/request-device/{id}")
+    public ResponseEntity<String> deleteRequest(@PathVariable Long id) {
+        requestDeviceService.deleteRequest(id);
+        return ResponseEntity.ok().body("Request deleted successfully");
+    }
 
-    //user bàn trả thiết bị
+    //trả thiết bi
+    @PostMapping("/return-device")
+    public ResponseEntity<String> returnDevice(@RequestParam Long deviceId , @RequestParam Long userId) {
+        String returnStatus = requestDeviceService.returnDevice(deviceId , userId);
+        return ResponseEntity.ok().body(returnStatus);
+    }
 
 
 

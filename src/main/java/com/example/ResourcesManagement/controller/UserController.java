@@ -5,6 +5,7 @@ import com.example.ResourcesManagement.DTO.request.LoginResquestDTO;
 import com.example.ResourcesManagement.DTO.response.UserResponseDTO;
 import com.example.ResourcesManagement.entity.UserEntity;
 import com.example.ResourcesManagement.service.UserService;
+import org.apache.coyote.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,11 +20,11 @@ public class UserController {
     UserService userService;
 
 
-    @PostMapping("/register")
-    public ResponseEntity<String> createStudent(@RequestBody CreateUserRequestDTO createUserRequestDTO) { //mapping
+   /* @PostMapping("/register")
+    public ResponseEntity<String> createUser(@RequestBody CreateUserRequestDTO createUserRequestDTO) { //mapping
         userService.createUser( createUserRequestDTO); //service
         return ResponseEntity.ok("Create successfully");  //status code -> restful
-    }
+    }*/
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginResquestDTO request) {

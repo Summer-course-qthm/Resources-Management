@@ -1,10 +1,236 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký Tài Khoản</title>
+    <style>
+        /* CSS Reset và Thiết lập cơ bản */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        /* Container chính cho bố cục 2 cột */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Cột bên trái (màu xám) */
+        .branding-side {
+            flex: 1;
+            background-color: #888888; /* Màu xám từ ảnh */
+        }
+
+        /* Cột bên phải (chứa form) */
+        .form-side {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background-color: #ffffff;
+        }
+
+        .form-container {
+            max-width: 450px;
+            width: 100%;
+        }
+
+        /* Tiêu đề */
+        .form-container h1 {
+            color: #cc0000; /* Màu đỏ từ ảnh */
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .form-container h2 {
+            color: #555;
+            font-weight: 300;
+            margin-bottom: 30px;
+        }
+
+        /* Form */
+        .registration-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Lưới 2 cột cho các trường input */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 cột bằng nhau */
+            gap: 20px; /* Khoảng cách giữa các ô */
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            color: #cc0000; /* Màu đỏ cho nhãn */
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        /* Nút Submit */
+        .submit-btn {
+            background-color: #cc0000; /* Màu đỏ */
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #a00000;
+        }
+
+        /* Link đăng nhập */
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .login-link a {
+            color: #cc0000;
+            text-decoration: none;
+        }
+
+        /* Responsive: Khi màn hình nhỏ, bỏ 2 cột */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .branding-side {
+                display: none; /* Ẩn cột xám trên di động */
+            }
+            .form-grid {
+                grid-template-columns: 1fr; /* 1 cột trên di động */
+            }
+        }
+    </style>
 </head>
 <body>
-$END$
+
+<div class="container">
+    <div class="branding-side"></div>
+
+    <div class="form-side">
+        <div class="form-container">
+            <h1>Welcome to NNT Software</h1>
+            <h2>Register your account</h2>
+            <form th:action="@{/register}" th:object="${user}" method="post">
+
+                <div class="form-grid">
+
+                    <div class="input-group">
+
+                        <label for="username">Username</label>
+
+                        <input type="text" th:field="*{username}" required>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label for="email">E-mail Address</label>
+
+                        <input type="email" th:field="*{email}" required>
+
+                    </div>
+
+
+
+                    <div class="input-group">
+
+                        <label for="phone">Phone Number</label>
+
+                        <input type="text" th:field="*{phone}" required>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label for="chapterId">Chapter ID</label>
+
+                        <input type="number" th:field="*{chapterId}" required>
+
+                    </div>
+
+
+
+                    <div class="input-group">
+
+                        <label for="password">Password</label>
+
+                        <input type="password" th:field="*{password}" required>
+
+                    </div>
+
+
+
+                    <div class="input-group">
+
+                        <label for="confirmPassword">Confirm Password</label>
+
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+
+                    </div>
+
+                </div>
+
+
+
+                <button type="submit" class="submit-btn">Create Account</button>
+
+
+
+                <div class="login-link">
+
+                    Already have an account? <a th:href="@{/login}">Log In</a>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--<script>
+    const form = document.getElementById('regForm');
+    form.addEventListener('submit', function(event) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+            alert('Mật khẩu xác nhận không khớp!');
+            event.preventDefault(); // Ngăn form submit
+        }
+    });
+</script>-->
+
 </body>
 </html>

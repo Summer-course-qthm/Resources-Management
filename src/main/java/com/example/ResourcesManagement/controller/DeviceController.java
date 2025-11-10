@@ -44,4 +44,9 @@ public class DeviceController {
     }
 
     // xóa thiết bị
+    @DeleteMapping("/devices/{id}")
+    public ResponseEntity<String> deleteDevice(@PathVariable Long id) {
+        deviceService.deleteDevice(id);
+        return ResponseEntity.ok().body("Device deleted successfully");
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.ResourcesManagement.controller;
 
 import com.example.ResourcesManagement.DTO.response.ChapterResponseDTO;
+import com.example.ResourcesManagement.entity.UserEntity;
 import com.example.ResourcesManagement.service.ChapterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,18 @@ public class ChapterController {
         chapterService.deleteChapter(id);
         return ResponseEntity.ok("Delete successfully");
     }
+
+    // chuyển tát cả user từ chapter này sang chapter khác
+    @PutMapping("/chapter/transferUsers")
+    public ResponseEntity<String> transferUsersToChapters(@RequestParam Long oldChapterId, @RequestParam Long newChapterId) {
+        chapterService.transferUsersToChapter(oldChapterId, newChapterId);
+        return ResponseEntity.ok("Transfer users successfully");
+    }
+
+
+
+
+
 
 
 
