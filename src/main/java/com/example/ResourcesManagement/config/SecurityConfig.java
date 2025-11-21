@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // === 1. API CÔNG KHAI (Không cần đăng nhập) ===
-                        .requestMatchers("/register", "/login","/test","/viewDevices","/viewRegister").permitAll()
+                        .requestMatchers("/register", "/login","/viewRegister","/viewLogin").permitAll()
 
                         // === 2. API CHỈ DÀNH CHO ADMIN ===
                         // Quản lý User
@@ -42,6 +42,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/user/update/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/user/removeFromChapter/**").hasRole("ADMIN")
                         // Quản lý Device
+                        .requestMatchers(HttpMethod.GET, "/viewDevices").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/devices").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/devices").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/devices/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/devices/**").hasRole("ADMIN")
@@ -63,6 +65,7 @@ public class SecurityConfig {
                         // === 4. API DÙNG CHUNG (Cần đăng nhập, bất kể vai trò) ===
                         .requestMatchers(HttpMethod.GET, "/devices", "/chapters", "/users/byChapter/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/devices/user/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/dashboardController").authenticated()
 
 
 

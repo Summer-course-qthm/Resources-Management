@@ -14,4 +14,7 @@ public interface RequetsRepository  extends JpaRepository<RequestEntity , Long> 
     Optional<DevicesEntity> findFirstByDeviceTypeAndStatus(String deviceType, String status);
 
     boolean existsByDeviceTypeAndRequestingUser(String deviceType, UserEntity userId);
+
+    // Hàm đếm số lượng request theo trạng thái
+    long countByStatus(String status);
 }

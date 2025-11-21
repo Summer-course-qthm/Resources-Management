@@ -28,6 +28,7 @@ public class ViewRegisterController {
     @PostMapping("/register")
     public String  registerUser(@ModelAttribute("user") CreateUserRequestDTO  user) {
         userService.createUser(user);
+
         return "login";
     }
 }

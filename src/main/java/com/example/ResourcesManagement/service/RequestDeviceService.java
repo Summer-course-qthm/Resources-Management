@@ -141,4 +141,9 @@ public class RequestDeviceService {
 
         return "Device returned successfully.";
     }
+
+    public long countRequestDevices() {
+        // Đếm tất cả các request có trạng thái là 'PENDING'
+        return requetsRepository.countByStatus("PENDING");
+    }
 }

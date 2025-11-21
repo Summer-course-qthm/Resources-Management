@@ -26,15 +26,16 @@ public class DeviceService {
     }
 
     // Lấy tất cả thiết bị
-    public List<DeviceResponseDTO> getAllDevices() {
+    // Trong DeviceService.java
 
+    public List<DeviceResponseDTO> getAllDevices() {
         List<DevicesEntity> entities = deviceRepository.findAll();
 
-        //  map qua DTO
-        return entities.stream().map( device -> DeviceResponseDTO.builder()
+        return entities.stream().map(device -> DeviceResponseDTO.builder()
                 .name(device.getDeviceName())
+                .type(device.getDeviceType()) // <-- Thêm dòng này
                 .status(device.getStatus())
-                .type(device.getDeviceType())
+                .note(device.getNote())       // <-- Thêm dòng này
                 .assignedUser(device.getAssignedUser() != null ? device.getAssignedUser().getUsername() : "Unassigned")
                 .build()).collect(Collectors.toList());
     }
@@ -85,5 +86,26 @@ public class DeviceService {
                 .orElseThrow(() -> new RuntimeException("Device not found"));
         deviceRepository.delete(device);
 
+    }
+
+
+    // Trong file DeviceService.java
+
+    public List<DeviceResponseDTO> searchDevices(String keyword) {
+        // Gọi repository tìm kiếm
+        List<DevicesEntity> entities = deviceRepository.findByDeviceNameContainingIgnoreCaseOrDeviceTypeContainingIgnoreCase(keyword, keyword);
+
+        // Tái sử dụng logic map sang DTO (bạn có thể tách logic map này ra hàm riêng để code gọn hơn)
+        return entities.stream().map(device -> DeviceResponseDTO.builder()
+                .name(device.getDeviceName())
+                .type(device.getDeviceType())
+                .status(device.getStatus())
+                .note(device.getNote())
+                .assignedUser(device.getAssignedUser() != null ? device.getAssignedUser().getUsername() : "Unassigned")
+                .build()).collect(Collectors.toList());
+    }
+
+    public long countDevices() {
+        return deviceRepository.count();
     }
 }

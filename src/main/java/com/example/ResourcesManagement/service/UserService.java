@@ -161,4 +161,8 @@ public class UserService implements UserDetailsService { // <-- THAY ĐỔI 1: i
         }
         return userDTOs;
     }
+
+    public long countUsers() {
+        return userRepository.count();
+    }
 }

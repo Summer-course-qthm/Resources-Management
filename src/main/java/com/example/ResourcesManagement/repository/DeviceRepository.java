@@ -22,4 +22,7 @@ public interface DeviceRepository  extends JpaRepository<DevicesEntity,Long> {
     // kiểm tra 1 người chửi đc mượn 1 devicetype và status available
     boolean existsByAssignedUserIdAndDeviceTypeAndStatus(Long userId, String deviceType, String status);
 
+    // THÊM PHƯƠNG THỨC NÀY: Tìm kiếm theo tên HOẶC loại (có chứa từ khóa)
+    List<DevicesEntity> findByDeviceNameContainingIgnoreCaseOrDeviceTypeContainingIgnoreCase(String name, String type);
+
 }

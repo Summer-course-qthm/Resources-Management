@@ -26,11 +26,11 @@ public class UserController {
         return ResponseEntity.ok("Create successfully");  //status code -> restful
     }*/
 
-    @PostMapping("/login")
+   /* @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginResquestDTO request) {
         String token = userService.login(request);
         return ResponseEntity.ok(token);
-    }
+    }*/
 
     // admin
     @GetMapping("/user/listUser")

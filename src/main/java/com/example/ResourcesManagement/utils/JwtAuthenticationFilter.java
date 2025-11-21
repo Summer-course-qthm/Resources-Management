@@ -3,6 +3,7 @@ package com.example.ResourcesManagement.utils;
 import com.example.ResourcesManagement.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie; // Nhớ import Cookie
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -26,6 +27,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    // Hàm hỗ trợ để lấy token từ Header HOẶC Cookie
+    private String getTokenFromRequest(HttpServletRequest request) {
+        // 1. Ưu tiên lấy từ Header (cho Postman/Mobile App)
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+
+        // 2. Nếu không có trong Header, tìm trong Cookie (cho Web/Thymeleaf)
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("JWT_TOKEN".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -33,41 +53,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
+        // Sử dụng hàm hỗ trợ để lấy token
+        final String jwt = getTokenFromRequest(request);
         final String username;
 
-        // 1. Kiểm tra xem header Authorization có hợp lệ không
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response); // Nếu không hợp lệ, cho qua để các filter khác xử lý
+        // Nếu không tìm thấy token ở đâu cả, cho qua để các filter khác xử lý (hoặc chặn lại sau)
+        if (jwt == null) {
+            filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. Trích xuất token và username
-        jwt = authHeader.substring(7);
-        username = jwtService.extractUsername(jwt);
+        // Nếu có token, tiến hành giải mã và xác thực
+        try {
+            username = jwtService.extractUsername(jwt);
 
-        // 3. Kiểm tra user hợp lệ và chưa được xác thực trong SecurityContext
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Tải thông tin user từ database
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            // 4. Nếu token hợp lệ, tiến hành xác thực
-            if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
-                // Tạo đối tượng xác thực
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities() // Gán quyền (role) cho user
-                );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // 5. Lưu thông tin xác thực vào SecurityContextHolder
-                // Đây là bước quan trọng nhất, báo cho Spring Security biết user này đã hợp lệ
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception e) {
+            // Nếu token lỗi hoặc hết hạn, không làm gì cả, cứ để request đi tiếp (sẽ bị chặn bởi SecurityConfig)
+            // Bạn có thể log lỗi ở đây nếu cần
         }
-        // 6. Chuyển request đi tiếp
+
         filterChain.doFilter(request, response);
     }
 }

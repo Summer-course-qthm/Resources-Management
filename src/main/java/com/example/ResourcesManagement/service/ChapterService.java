@@ -72,4 +72,8 @@ public class ChapterService {
         }
 
     }
+
+    public long countChapters() {
+        return chapterRepository.count();
+    }
 }
