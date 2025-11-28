@@ -1,0 +1,94 @@
+/* === CẤU HÌNH CHUNG === */
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f8f9fa;
+    overflow-x: hidden; /* Ẩn thanh cuộn ngang */
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* === SIDEBAR (THANH BÊN TRÁI) === */
+#sidebar-wrapper {
+    min-height: 100vh;
+    width: 16rem; /* Chiều rộng sidebar */
+    background-color: #0d6efd; /* Màu xanh chủ đạo */
+    color: white;
+    position: fixed; /* Cố định vị trí */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    transition: margin .25s ease-out;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+/* Header của Sidebar */
+.sidebar-heading {
+    padding: 1.5rem 1.5rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: white;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Danh sách menu */
+.list-group { width: 100%; }
+
+.list-group-item {
+    background-color: transparent;
+    color: rgba(255,255,255,0.85);
+    border: none;
+    padding: 12px 25px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.list-group-item i {
+    width: 25px; /* Cố định chiều rộng icon để thẳng hàng */
+    text-align: center;
+    margin-right: 10px;
+}
+
+/* Hiệu ứng khi di chuột hoặc Active */
+.list-group-item:hover,
+.list-group-item.active {
+    background-color: rgba(255,255,255,0.15);
+    color: #fff;
+    border-left: 4px solid white; /* Viền trắng bên trái */
+    padding-left: 21px; /* Bù lại 4px viền để chữ không bị đẩy */
+}
+
+/* Nút Đăng xuất ở dưới cùng */
+.mt-auto { margin-top: auto !important; }
+
+/* === MAIN CONTENT (NỘI DUNG BÊN PHẢI) === */
+#page-content-wrapper {
+    width: 100%;
+    margin-left: 16rem; /* Đẩy sang phải bằng chiều rộng sidebar */
+    min-height: 100vh;
+    transition: margin .25s ease-out;
+}
+
+/* Navbar trên cùng */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+/* === RESPONSIVE (DI ĐỘNG) === */
+@media (max-width: 768px) {
+    #sidebar-wrapper { margin-left: -16rem; } /* Ẩn sidebar */
+    #page-content-wrapper { margin-left: 0; } /* Full màn hình */
+
+    /* Khi bấm nút toggle */
+    body.sb-sidenav-toggled #sidebar-wrapper { margin-left: 0; }
+    body.sb-sidenav-toggled #page-content-wrapper { margin-left: 16rem; }
+}
+
+/* === TIỆN ÍCH KHÁC === */
+.card { border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); border-radius: 0.5rem; }
+.btn-primary { background-color: #0d6efd; border-color: #0d6efd; }

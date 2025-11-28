@@ -1,3 +1,4 @@
+/*
 package com.example.ResourcesManagement.controller;
 
 import com.example.ResourcesManagement.DTO.request.CreateDeviceRequestDTO;
@@ -50,3 +51,4 @@ public class DeviceController {
         return ResponseEntity.ok().body("Device deleted successfully");
     }
 }
+*/

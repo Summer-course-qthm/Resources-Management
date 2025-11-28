@@ -1,3 +1,4 @@
+/*
 package com.example.ResourcesManagement.controller;
 
 import com.example.ResourcesManagement.DTO.response.ChapterResponseDTO;
@@ -56,3 +57,4 @@ public class ChapterController {
 
 
 }
+*/

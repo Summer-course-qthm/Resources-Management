@@ -33,44 +33,49 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // === 1. API CÔNG KHAI (Không cần đăng nhập) ===
-                        .requestMatchers("/register", "/login","/viewRegister","/viewLogin").permitAll()
+                        .requestMatchers("/register", "/login", "/viewRegister", "/viewLogin", "/css/**", "/js/**", "/images/**").permitAll()
 
-                        // === 2. API CHỈ DÀNH CHO ADMIN ===
-                        // Quản lý User
-                        .requestMatchers(HttpMethod.GET, "/user/listUser").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/user/delete/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/user/update/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/user/removeFromChapter/**").hasRole("ADMIN")
-                        // Quản lý Device
-                        .requestMatchers(HttpMethod.GET, "/viewDevices").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/devices").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/devices").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/devices/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/devices/**").hasRole("ADMIN")
-                        // Quản lý Chapter
-                        .requestMatchers(HttpMethod.PUT, "/chapter/update/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/chapter/delete/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/chapter/transferUsers").hasRole("ADMIN")
-                        // Quản lý Checklist
-                        .requestMatchers(HttpMethod.POST, "/checklist", "/checkListItem").hasRole("ADMIN")
-                        // Quản lý Request (xử lý yêu cầu)
-                        .requestMatchers(HttpMethod.PUT, "/check-stock").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/request-device").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/request-device/**").hasRole("ADMIN")
+                        // === 2. CHỨC NĂNG DÙNG CHUNG (ADMIN + USER) ===
+                        // Xem danh sách thiết bị (Theo yêu cầu: User được xem)
+                        .requestMatchers(HttpMethod.GET, "/viewDevices").hasAnyRole("ADMIN", "USER")
+                        // API lấy dữ liệu thiết bị (nếu trang web gọi AJAX)
+                        .requestMatchers(HttpMethod.GET, "/devices").hasAnyRole("ADMIN", "USER")
 
-                        // === 3. API DÀNH CHO USER (Admin không dùng) ===
-                        // User gửi yêu cầu mượn thiết bị
+                        // === 3. CHỨC NĂNG CỦA USER (ADMIN KHÔNG DÙNG) ===
+                        // Gửi yêu cầu mượn thiết bị (User cần quyền này để thao tác, nếu bạn muốn chặn luôn thì xóa dòng này)
                         .requestMatchers(HttpMethod.POST, "/request-device").hasRole("USER")
 
-                        // === 4. API DÙNG CHUNG (Cần đăng nhập, bất kể vai trò) ===
-                        .requestMatchers(HttpMethod.GET, "/devices", "/chapters", "/users/byChapter/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/devices/user/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/dashboardController").authenticated()
+                        // === 4. CHỨC NĂNG QUẢN TRỊ (CHỈ ADMIN) ===
 
+                        // --- Dashboard ---
+                        .requestMatchers("/dashboardController").hasRole("ADMIN")
 
+                        // --- Quản lý Thiết bị (Thêm, Sửa, Xóa) ---
+                        .requestMatchers("/devices/add", "/devices/edit/**", "/devices/delete/**").hasRole("ADMIN") // Form giao diện
+                        .requestMatchers("/saveDevice").hasRole("ADMIN") // Action lưu
+
+                        // --- Quản lý Nhân viên (Thêm, Sửa, Xóa, Xem danh sách) ---
+                        .requestMatchers("/viewEmployees").hasRole("ADMIN")
+                        .requestMatchers("/employees/add", "/employees/edit/**", "/employees/delete/**").hasRole("ADMIN") // Form giao diện
+                        .requestMatchers("/saveEmployee").hasRole("ADMIN") // Action lưu
+
+                        // --- Các API Quản trị User (Backend) ---
+                        .requestMatchers("/user/listUser", "/user/delete/**", "/user/update/**", "/user/removeFromChapter/**").hasRole("ADMIN")
+
+                        // --- Quản lý Chapter ---
+                        .requestMatchers("/viewDepartments").hasRole("ADMIN")
+                        .requestMatchers("/chapter/**").hasRole("ADMIN")
+
+                        // --- Quản lý Yêu cầu (Duyệt/Xóa) ---
+                        .requestMatchers("/viewRequests").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/check-stock").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/request-device").hasRole("ADMIN") // Xem danh sách yêu cầu
+                        .requestMatchers(HttpMethod.DELETE, "/request-device/**").hasRole("ADMIN")
+
+                        // --- Quản lý Checklist ---
+                        .requestMatchers("/checklist/**", "/checkListItem/**").hasRole("ADMIN")
 
                         // === 5. QUY TẮC CUỐI CÙNG ===
-                        // Bất kỳ request nào khác chưa được định nghĩa ở trên đều yêu cầu phải xác thực
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

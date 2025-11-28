@@ -98,9 +98,27 @@
               </td>
 
               <td class="text-end pe-4">
-                <button class="btn btn-sm btn-outline-primary border-0" title="Chỉnh sửa"><i class="fa-solid fa-pen"></i></button>
-                <button class="btn btn-sm btn-outline-danger border-0" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+
+                <!-- Nút Edit -->
+                <a th:href="@{/devices/edit/{id}(id=${device.deviceId})}"
+                   class="btn btn-sm btn-outline-primary border-0"
+                   title="Chỉnh sửa">
+                  <i class="fa-solid fa-pen"></i>
+                </a>
+
+
+                <!-- Nút Delete -->
+                <a th:href="@{/devices/delete/{id}(id=${device.deviceId})}"
+                   class="btn btn-sm btn-outline-danger border-0"
+                   onclick="return confirm('Bạn có chắc chắn muốn xóa thiết bị này không?');"
+                   title="Xóa">
+                  <i class="fa-solid fa-trash"></i>
+                </a>
+
+
               </td>
+
+
             </tr>
             </tbody>
           </table>

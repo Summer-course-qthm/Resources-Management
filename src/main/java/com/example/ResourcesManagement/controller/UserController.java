@@ -1,3 +1,4 @@
+/*
 package com.example.ResourcesManagement.controller;
 
 import com.example.ResourcesManagement.DTO.request.CreateUserRequestDTO;
@@ -20,17 +21,21 @@ public class UserController {
     UserService userService;
 
 
-   /* @PostMapping("/register")
+   */
+/* @PostMapping("/register")
     public ResponseEntity<String> createUser(@RequestBody CreateUserRequestDTO createUserRequestDTO) { //mapping
         userService.createUser( createUserRequestDTO); //service
         return ResponseEntity.ok("Create successfully");  //status code -> restful
-    }*/
+    }*//*
 
-   /* @PostMapping("/login")
+
+   */
+/* @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginResquestDTO request) {
         String token = userService.login(request);
         return ResponseEntity.ok(token);
-    }*/
+    }*//*
+
 
     // admin
     @GetMapping("/user/listUser")
@@ -70,3 +75,4 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 }
+*/

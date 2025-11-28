@@ -64,7 +64,7 @@
                     <button class="btn btn-primary">Tìm</button>
                 </div>
 
-                <a href="/viewRegister" class="btn btn-success shadow-sm">
+                <a href="/employees/add" class="btn btn-success shadow-sm">
                     <i class="fa-solid fa-user-plus me-1"></i> Thêm nhân viên
                 </a>
             </div>
@@ -102,8 +102,15 @@
                                 </td>
 
                                 <td class="text-end pe-4">
-                                    <button class="btn btn-sm btn-outline-primary border-0 me-1" title="Chỉnh sửa"><i class="fa-solid fa-pen-to-square"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger border-0" title="Xóa"><i class="fa-solid fa-trash-can"></i></button>
+                                    <a th:href="@{/employees/edit/{id}(id=${user.id})}" class="btn btn-sm btn-outline-primary border-0 me-1">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+
+                                    <a th:href="@{/employees/delete/{id}(id=${user.id})}"
+                                       class="btn btn-sm btn-outline-danger border-0"
+                                       onclick="return confirm('Xóa nhân viên này?');">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
                                 </td>
                             </tr>
                             </tbody>

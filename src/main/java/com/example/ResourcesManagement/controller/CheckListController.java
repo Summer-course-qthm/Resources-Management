@@ -1,3 +1,4 @@
+/*
 package com.example.ResourcesManagement.controller;
 
 import com.example.ResourcesManagement.DTO.request.CheckListRequestDTO;
@@ -23,3 +24,4 @@ public class CheckListController {
 
 
 }
+*/

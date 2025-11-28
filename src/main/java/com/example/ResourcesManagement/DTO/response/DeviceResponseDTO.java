@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class DeviceResponseDTO {
+    private Long deviceId;
     private String name;
     private String type;
     private String status;

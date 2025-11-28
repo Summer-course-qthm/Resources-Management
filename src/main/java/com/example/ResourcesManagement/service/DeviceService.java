@@ -32,6 +32,7 @@ public class DeviceService {
         List<DevicesEntity> entities = deviceRepository.findAll();
 
         return entities.stream().map(device -> DeviceResponseDTO.builder()
+                .deviceId(device.getDeviceId())
                 .name(device.getDeviceName())
                 .type(device.getDeviceType()) // <-- Thêm dòng này
                 .status(device.getStatus())
@@ -62,6 +63,8 @@ public class DeviceService {
         DevicesEntity device = deviceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Device not found"));
 
+        device.setDeviceName(createDeviceRequestDTO.getDeviceName());
+        device.setDeviceType(createDeviceRequestDTO.getDeviceType());
         device.setStatus(createDeviceRequestDTO.getStatus());
         device.setNote(createDeviceRequestDTO.getNote());
         device.setIsChecked(createDeviceRequestDTO.getIsChecked());
@@ -97,6 +100,7 @@ public class DeviceService {
 
         // Tái sử dụng logic map sang DTO (bạn có thể tách logic map này ra hàm riêng để code gọn hơn)
         return entities.stream().map(device -> DeviceResponseDTO.builder()
+                .deviceId(device.getDeviceId())
                 .name(device.getDeviceName())
                 .type(device.getDeviceType())
                 .status(device.getStatus())
@@ -107,5 +111,19 @@ public class DeviceService {
 
     public long countDevices() {
         return deviceRepository.count();
+    }
+
+    public DeviceResponseDTO getDeviceById(Long id) {
+        DevicesEntity device = deviceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Device not found"));
+
+        return DeviceResponseDTO.builder()
+                .deviceId(id)
+                .name(device.getDeviceName())
+                .type(device.getDeviceType())
+                .status(device.getStatus())
+                .note(device.getNote())
+                .assignedUser(device.getAssignedUser() != null ? device.getAssignedUser().getUsername() : "Unassigned")
+                .build();
     }
 }

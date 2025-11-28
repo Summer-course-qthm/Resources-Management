@@ -1,3 +1,4 @@
+/*
 package com.example.ResourcesManagement.controller;
 
 import com.example.ResourcesManagement.DTO.request.ResquestDeviceDTO;
@@ -52,3 +53,4 @@ public class RequestDeviceController {
 
 
 }
+*/

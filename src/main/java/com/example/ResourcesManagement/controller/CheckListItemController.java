@@ -1,3 +1,4 @@
+/*
 package com.example.ResourcesManagement.controller;
 
 import com.example.ResourcesManagement.DTO.request.CheckListItemRequestDTO;
@@ -20,3 +21,4 @@ public class CheckListItemController {
         return ResponseEntity.ok().body("Thêm checkListItem thành công");
     }
 }
+*/
