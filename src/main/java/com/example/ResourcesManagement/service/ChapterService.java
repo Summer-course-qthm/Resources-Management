@@ -1,5 +1,6 @@
 package com.example.ResourcesManagement.service;
 
+import com.example.ResourcesManagement.DTO.request.ChapterRequestDTO;
 import com.example.ResourcesManagement.DTO.response.ChapterResponseDTO;
 import com.example.ResourcesManagement.entity.ChapterEntity;
 import com.example.ResourcesManagement.entity.UserEntity;
@@ -22,18 +23,34 @@ public class ChapterService {
         List<ChapterEntity> chapters = chapterRepository.findAll();
 
         return chapters.stream().map(chapter -> ChapterResponseDTO.builder()
+                .id(chapter.getId())
                 .name(chapter.getName())
                 .description(chapter.getDescription())
                 .build()).toList();
 
     }
 
-    public void updateChapter(Long id, ChapterResponseDTO chapterResponseDTO) {
+    // thêm chapter mới
+    public void addChapter(ChapterRequestDTO chapterResponseDTO) {
+        // kiem tra ten chapter da ton tai chua
+        if (chapterRepository.existsByName(chapterResponseDTO.getName())) {
+            throw new RuntimeException("Chapter name already exists");
+        }
+
+        ChapterEntity chapter = ChapterEntity.builder()
+                .name(chapterResponseDTO.getName())
+                .description(chapterResponseDTO.getDescription())
+                .build();
+
+        chapterRepository.save(chapter);
+    }
+
+    public void updateChapter(Long id, ChapterRequestDTO chapterRequestDTO) {
         ChapterEntity chapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Chapter not found"));
 
-        chapter.setName(chapterResponseDTO.getName());
-        chapter.setDescription(chapterResponseDTO.getDescription());
+        chapter.setName(chapterRequestDTO.getName());
+        chapter.setDescription(chapterRequestDTO.getDescription());
 
         chapterRepository.save(chapter);
     }
@@ -75,5 +92,15 @@ public class ChapterService {
 
     public long countChapters() {
         return chapterRepository.count();
+    }
+
+    public ChapterRequestDTO getChapterById(Long id) {
+        ChapterEntity chapter = chapterRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Chapter not found"));
+
+        return ChapterRequestDTO.builder()
+                .name(chapter.getName())
+                .description(chapter.getDescription())
+                .build();
     }
 }

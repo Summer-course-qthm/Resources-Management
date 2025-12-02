@@ -20,6 +20,10 @@ public class ChecklistItemEntity {
     @Column(name = "item_description")
     private String itemDescription;
 
+    // thêm mục đã check hay chưa
+    @Column(name = "is_checked")
+    private Boolean isChecked;
+
     // Nhiều mục con thuộc về một Checklist
 
     @ManyToOne

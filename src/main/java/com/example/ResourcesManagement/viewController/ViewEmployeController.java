@@ -2,6 +2,7 @@ package com.example.ResourcesManagement.viewController;
 
 import com.example.ResourcesManagement.DTO.request.CreateUserRequestDTO;
 import com.example.ResourcesManagement.entity.UserEntity;
+import com.example.ResourcesManagement.service.RequestDeviceService;
 import com.example.ResourcesManagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,8 +19,14 @@ public class ViewEmployeController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    RequestDeviceService requestDeviceService;
+
     @GetMapping("/viewEmployees") // cái api ni ch config trong security để ai cũng truy cập đc
     public String viewEmployees(Model model) {
+
+        long requestDeviceCount = requestDeviceService.countRequestDevices();
+        model.addAttribute("requestDeviceCount", requestDeviceCount);
         model.addAttribute("employees", userService.getListUser());
         return "employee";
     }

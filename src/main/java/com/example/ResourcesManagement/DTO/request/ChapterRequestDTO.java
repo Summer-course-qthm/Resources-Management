@@ -1,4 +1,4 @@
-package com.example.ResourcesManagement.DTO.response;
+package com.example.ResourcesManagement.DTO.request;
 import lombok.*;
 
 @Getter
@@ -6,8 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChapterResponseDTO {
-    private  Long id;
+public class ChapterRequestDTO {
     private String name;
     private String description;
 }

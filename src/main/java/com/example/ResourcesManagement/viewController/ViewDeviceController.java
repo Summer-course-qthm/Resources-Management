@@ -5,6 +5,7 @@ import com.example.ResourcesManagement.DTO.response.DeviceResponseDTO;
 
 import com.example.ResourcesManagement.entity.DevicesEntity;
 import com.example.ResourcesManagement.service.DeviceService;
+import com.example.ResourcesManagement.service.RequestDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.core.ParameterizedTypeReference;
@@ -25,6 +26,8 @@ public class ViewDeviceController {
     private DeviceService deviceService;
     private final RestTemplate restTemplate = new RestTemplate();
 
+    @Autowired
+    RequestDeviceService requestDeviceService;
     @GetMapping("/viewDevices")
     public String viewDevices(Model model, @RequestParam(required = false) String keyword) {
         List<DeviceResponseDTO> devices;
@@ -35,7 +38,8 @@ public class ViewDeviceController {
         } else {
             devices = deviceService.getAllDevices();
         }
-
+        long requestDeviceCount = requestDeviceService.countRequestDevices();
+        model.addAttribute("requestDeviceCount", requestDeviceCount);
         model.addAttribute("devices", devices);
         model.addAttribute("keyword", keyword);
 

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Checklist thiết bị</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body { background-color: #f8f9fa; overflow: hidden; }
+    #sidebar-wrapper { min-height: 100vh; background-color: #0d6efd; }
+    #sidebar-wrapper .sidebar-heading { padding: 1.5rem 1.25rem; font-size: 1.2rem; color: #fff; font-weight: bold; }
+    #sidebar-wrapper .list-group-item { background-color: #0d6efd; color: rgba(255,255,255,0.8); border: none; }
+    #sidebar-wrapper .list-group-item:hover, #sidebar-wrapper .list-group-item.active {
+        background-color: rgba(255,255,255,0.2); color: #fff; border-left: 4px solid #fff;
+    }
+    #page-content-wrapper { height: 100vh; overflow-y: auto; }
+  </style>
+</head>
+<body>
+
+<div class="d-flex" id="wrapper">
+
+  <!-- SIDEBAR -->
+  <div class="border-end" id="sidebar-wrapper">
+    <div class="sidebar-heading"><i class="fa-brands fa-nfc-symbol me-2"></i>NNT Software</div>
+    <div class="list-group list-group-flush">
+      <a href="/dashboardController" class="list-group-item list-group-item-action">
+        <i class="fa-solid fa-house me-2"></i> Dashboard
+      </a>
+      <a href="/viewDevices" class="list-group-item list-group-item-action">
+        <i class="fa-solid fa-laptop me-2"></i> Thiết bị
+      </a>
+      <a href="/viewChecklist" class="list-group-item list-group-item-action active">
+        <i class="fa-solid fa-list-check me-2"></i> Checklist
+      </a>
+      <a href="/logout" class="list-group-item list-group-item-action border-top border-white-50 mt-auto">
+        <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="page-content-wrapper">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3">
+      <h2 class="fs-4 m-0 text-secondary">Danh sách Checklist</h2>
+      <a href="/viewChecklistCreate" class="btn btn-primary ms-auto">
+        <i class="fa-solid fa-plus me-1"></i> Tạo Checklist
+      </a>
+    </nav>
+
+    <div class="container py-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+          <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+              <th>#</th>
+              <th>Thiết bị</th>
+              <th>Loại</th>
+              <th>Ngày tạo</th>
+              <th class="text-end">Hành động</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="item : ${checklists}">
+              <td th:text="${item.id}">1</td>
+              <td th:text="${item.deviceName}">Laptop Dell</td>
+              <td th:text="${item.type}">Trước khi mượn</td>
+              <td th:text="${item.createdAt}">2025-12-01</td>
+
+              <td class="text-end">
+                <a th:href="@{'/viewChecklistDetail/' + ${item.id}}" class="btn btn-sm btn-outline-primary">
+                  <i class="fa-solid fa-eye"></i> Xem
+                </a>
+              </td>
+            </tr>
+            </tbody>
+
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

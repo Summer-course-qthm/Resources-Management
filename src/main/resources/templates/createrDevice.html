@@ -1,42 +1,32 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thêm / Sửa Thiết Bị - NNT Software</title>
-
-  <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
   <style>
-    body { background-color: #f8f9fa; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
-
-    #sidebar-wrapper { min-height: 100vh; margin-left: -15rem; transition: margin .25s ease-out; background-color: #0d6efd; width: 15rem; }
-    #sidebar-wrapper .sidebar-heading { padding: 1.5rem 1.25rem; font-size: 1.2rem; font-weight: bold; color: white; border-bottom: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; }
-    #sidebar-wrapper .list-group { width: 100%; }
-    #sidebar-wrapper .list-group-item { background-color: #0d6efd; color: rgba(255,255,255,0.8); border: none; padding: 1rem 1.25rem; transition: all 0.2s; }
-    #sidebar-wrapper .list-group-item:hover, #sidebar-wrapper .list-group-item.active { background-color: rgba(255,255,255,0.2); color: #fff; border-left: 4px solid white; font-weight: 600; padding-left: 1.5rem; }
-
+    body { background-color: #f8f9fa; overflow: hidden; }
+    #sidebar-wrapper { min-height: 100vh; margin-left: -15rem; transition: margin .25s ease-out; background-color: #0d6efd; }
+    #sidebar-wrapper .sidebar-heading { padding: 1.5rem 1.25rem; font-size: 1.2rem; font-weight: bold; color: white; border-bottom: 1px solid rgba(255,255,255,0.2); }
+    #sidebar-wrapper .list-group { width: 15rem; }
+    #sidebar-wrapper .list-group-item { background-color: #0d6efd; color: rgba(255,255,255,0.8); border: none; padding: 1rem 1.25rem; }
+    #sidebar-wrapper .list-group-item:hover, #sidebar-wrapper .list-group-item.active { background-color: rgba(255,255,255,0.2); color: #fff; border-left: 4px solid white; font-weight: 600; }
     #page-content-wrapper { width: 100%; overflow-y: auto; height: 100vh; }
-    @media (min-width: 768px) { #sidebar-wrapper { margin-left: 0; } body.sb-sidenav-toggled #sidebar-wrapper { margin-left: -15rem; } }
-
-    .form-label { font-weight: 600; color: #495057; }
-    .card { border: none; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05); border-radius: 10px; }
-    .form-control:focus, .form-select:focus { border-color: #0d6efd; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15); }
+    body.sb-sidenav-toggled #sidebar-wrapper { margin-left: 0; }
+    @media (min-width: 768px) {
+        #sidebar-wrapper { margin-left: 0; }
+        #page-content-wrapper { min-width: 0; width: 100%; }
+        body.sb-sidenav-toggled #sidebar-wrapper { margin-left: -15rem; }
+    }
   </style>
-
 </head>
-
 <body>
 
 <div class="d-flex" id="wrapper">
-
-  <!-- Sidebar -->
   <div class="border-end" id="sidebar-wrapper">
     <div class="sidebar-heading"><i class="fa-brands fa-nfc-symbol me-2"></i>NNT Software</div>
-
     <div class="list-group list-group-flush">
       <a href="/dashboardControler" class="list-group-item list-group-item-action"><i class="fa-solid fa-house me-2"></i> Dashboard</a>
       <a href="/viewDevices" class="list-group-item list-group-item-action active"><i class="fa-solid fa-laptop me-2"></i> Thiết bị</a>
@@ -50,66 +40,38 @@
     </div>
   </div>
 
-  <!-- Page Content -->
   <div id="page-content-wrapper">
-
-    <!-- Top Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3 sticky-top">
-      <div class="d-flex align-items-center">
-        <button class="btn btn-primary d-md-none me-3" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
-        <h2 class="fs-4 m-0 text-secondary">
-          <span th:text="${deviceId != null} ? 'Cập nhật thiết bị' : 'Thêm mới thiết bị'"></span>
-        </h2>
-      </div>
-
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3">
+      <h2 class="fs-4 m-0 text-secondary" th:text="${deviceId != null} ? 'Cập nhật thiết bị' : 'Thêm mới thiết bị'"></h2>
       <div class="ms-auto d-flex align-items-center">
-        <span class="me-2 text-muted d-none d-md-block">Xin chào, <strong>Admin</strong></span>
-        <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center" style="width: 35px; height: 35px;">A</div>
+        <span class="me-2 text-muted">Xin chào, <strong>Admin</strong></span>
+        <img src="https://ui-avatars.com/api/?name=Admin&background=random" class="rounded-circle" width="32" height="32">
       </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container-fluid px-4 py-4">
-
       <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/viewDevices" class="text-decoration-none">Danh sách thiết bị</a></li>
-          <li class="breadcrumb-item active" aria-current="page">
-            <span th:text="${deviceId != null} ? 'Cập nhật' : 'Thêm mới'"></span>
-          </li>
+          <li class="breadcrumb-item active" aria-current="page" th:text="${deviceId != null} ? 'Cập nhật' : 'Thêm mới'"></li>
         </ol>
       </nav>
 
       <div class="row justify-content-center">
         <div class="col-xl-8 col-lg-10">
-
-          <div class="card">
+          <div class="card border-0 shadow-sm">
             <div class="card-header bg-white py-3 border-bottom-0">
-              <h5 class="mb-0 text-primary"><i class="fa-solid fa-circle-plus me-2"></i>
-                <span th:text="${deviceId != null} ? 'Chỉnh sửa thiết bị' : 'Thông tin thiết bị'"></span>
-              </h5>
+              <h5 class="mb-0 text-primary"><i class="fa-solid fa-circle-plus me-2"></i> Thông tin thiết bị</h5>
             </div>
-
             <div class="card-body p-4">
-
-              <!-- Form -->
-              <form th:action="${deviceId != null} ?
-                 @{/devices/edit/{id}(id=${deviceId})} :
-                 @{/devices/add}"
-                    method="post"
-                    th:object="${deviceRequest}">
-
+              <form th:action="${deviceId != null} ? @{/devices/edit/{id}(id=${deviceId})} : @{/devices/add}" method="post" th:object="${deviceRequest}">
                 <div class="row g-4">
-
-                  <!-- deviceName -->
                   <div class="col-md-6">
-                    <label class="form-label">Tên thiết bị <span class="text-danger">*</span></label>
+                    <label class="form-label fw-semibold">Tên thiết bị <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" th:field="*{deviceName}" required>
                   </div>
-
-                  <!-- deviceType -->
                   <div class="col-md-6">
-                    <label class="form-label">Loại thiết bị <span class="text-danger">*</span></label>
+                    <label class="form-label fw-semibold">Loại thiết bị <span class="text-danger">*</span></label>
                     <select class="form-select" th:field="*{deviceType}" required>
                       <option value="" disabled>-- Chọn loại --</option>
                       <option value="laptop">Laptop</option>
@@ -119,67 +81,42 @@
                       <option value="accessory">Accessory</option>
                     </select>
                   </div>
-
-                  <!-- status -->
                   <div class="col-md-6">
-                    <label class="form-label">Trạng thái</label>
+                    <label class="form-label fw-semibold">Trạng thái</label>
                     <select class="form-select" th:field="*{status}">
                       <option value="available">Available</option>
                       <option value="assigned">Assigned</option>
                       <option value="under_maintenance">Under Maintenance</option>
                     </select>
                   </div>
-
-                  <!-- isChecked -->
                   <div class="col-md-6">
-                    <label class="form-label">Đã kiểm tra?</label>
+                    <label class="form-label fw-semibold">Đã kiểm tra?</label>
                     <select class="form-select" th:field="*{isChecked}">
                       <option value="true">Có</option>
                       <option value="false">Không</option>
                     </select>
                   </div>
-
-                  <!-- checklistId -->
                   <div class="col-md-6">
-                    <label class="form-label">Checklist ID</label>
-                    <input type="number" class="form-control" th:field="*{checklistId}" placeholder="Nhập ID checklist">
+                    <label class="form-label fw-semibold">Checklist ID</label>
+                    <input type="number" class="form-control" th:field="*{checklistId}">
                   </div>
-
-                  <!-- note -->
                   <div class="col-12">
-                    <label class="form-label">Ghi chú</label>
+                    <label class="form-label fw-semibold">Ghi chú</label>
                     <textarea class="form-control" th:field="*{note}" rows="3"></textarea>
                   </div>
                 </div>
-
                 <div class="d-flex justify-content-end mt-5 gap-2">
                   <a href="/viewDevices" class="btn btn-light border px-4">Hủy</a>
-
-                  <button type="submit" class="btn btn-primary px-4">
-                    <i class="fa-solid fa-save me-2"></i>
-                    <span th:text="${deviceId != null} ? 'Cập nhật thiết bị' : 'Lưu thiết bị'"></span>
-                  </button>
+                  <button type="submit" class="btn btn-primary px-4" th:text="${deviceId != null} ? 'Cập nhật' : 'Lưu'"></button>
                 </div>
-
               </form>
-              <!-- End Form -->
-
             </div>
           </div>
-
         </div>
       </div>
-
     </div>
   </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  var el = document.getElementById("wrapper");
-  var toggleButton = document.getElementById("sidebarToggle");
-  toggleButton.onclick = function () { el.classList.toggle("toggled"); };
-</script>
-
 </body>
 </html>

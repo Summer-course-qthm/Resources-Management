@@ -26,6 +26,7 @@ public class RequestDeviceService {
     @Autowired
     DeviceRepository deviceRepository;
 
+
     public String addRequest(ResquestDeviceDTO request) {
         UserEntity User = userRepository.findById(request.getUserId()).orElseThrow(()-> new RuntimeException("User not found"));
         RequestEntity requestEntity = RequestEntity.builder()
@@ -44,9 +45,14 @@ public class RequestDeviceService {
     }
 
 
-
+    // 1. Lấy danh sách yêu cầu (Chỉ lấy PENDING để hiện lên bảng chờ duyệt)
     public List<RequestResponseDTO> getAllRequest() {
-        List<RequestEntity> requestEntities = requetsRepository.findAll();
+
+        List<RequestEntity> requestEntities = requetsRepository.findByStatus("PENDING");
+        if (requestEntities .isEmpty()) {
+            throw new RuntimeException("No pending requests found");
+        }
+
         // Chuyển đổi List<RequestEntity> thành List<RequestResponseDTO>
         List<RequestResponseDTO> requestResponseDTOs = requestEntities.stream().map(requestEntity -> {
            // người gửi request

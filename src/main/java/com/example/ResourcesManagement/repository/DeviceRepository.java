@@ -1,6 +1,7 @@
 package com.example.ResourcesManagement.repository;
 
 import com.example.ResourcesManagement.entity.DevicesEntity;
+import com.example.ResourcesManagement.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,5 +25,10 @@ public interface DeviceRepository  extends JpaRepository<DevicesEntity,Long> {
 
     // THÊM PHƯƠNG THỨC NÀY: Tìm kiếm theo tên HOẶC loại (có chứa từ khóa)
     List<DevicesEntity> findByDeviceNameContainingIgnoreCaseOrDeviceTypeContainingIgnoreCase(String name, String type);
+
+    // Tìm thiết bị đầu tiên có trạng thái 'available' và đúng loại
+    Optional<DevicesEntity> findFirstByStatusAndDeviceType(String status, String deviceType);
+
+    boolean existsByDeviceTypeAndAssignedUser(String deviceType, UserEntity user);
 
 }

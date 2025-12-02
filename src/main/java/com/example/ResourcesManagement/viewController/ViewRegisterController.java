@@ -1,6 +1,7 @@
 package com.example.ResourcesManagement.viewController;
 
 import com.example.ResourcesManagement.DTO.request.CreateUserRequestDTO;
+import com.example.ResourcesManagement.service.RequestDeviceService;
 import com.example.ResourcesManagement.service.UserService;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,15 @@ public class ViewRegisterController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    RequestDeviceService requestDeviceService;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     @GetMapping("/viewRegister")
     public  String createUser(Model model) {
+        long requestDeviceCount = requestDeviceService.countRequestDevices();
+        model.addAttribute("requestDeviceCount", requestDeviceCount);
         model.addAttribute("user", new CreateUserRequestDTO());
             return "register";
     }
