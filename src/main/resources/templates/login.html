@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đăng nhập</title>
+  <title>Đăng nhập - NNT Software</title>
   <style>
-    /* Đặt các font chữ cơ bản và reset margin */
+    /* CSS Cơ bản */
     body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         background-color: #f8f9fa;
@@ -17,7 +17,6 @@
         height: 100vh;
     }
 
-    /* Container chính chứa 2 cột */
     .login-container {
         display: flex;
         width: 900px;
@@ -25,21 +24,19 @@
         background-color: #ffffff;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         border-radius: 10px;
-        overflow: hidden; /* Đảm bảo các góc bo tròn */
+        overflow: hidden;
     }
 
-    /* Cột bên trái chứa form */
     .login-form-wrapper {
-        flex: 1; /* Chiếm 1 phần */
+        flex: 1;
         padding: 40px;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
 
-    /* Cột bên phải chứa ảnh */
     .login-image-wrapper {
-        flex: 1.5; /* Chiếm 1.5 phần (lớn hơn) */
+        flex: 1.5;
         background-color: #333;
         overflow: hidden;
     }
@@ -47,12 +44,11 @@
     .login-image-wrapper img {
         width: 100%;
         height: 100%;
-        object-fit: cover; /* Đảm bảo ảnh lấp đầy mà không bị méo */
+        object-fit: cover;
     }
 
-    /* Định dạng các thành phần trong form */
     .login-form h2 {
-        color: #D32F2F; /* Màu đỏ như trong ảnh */
+        color: #D32F2F;
         font-size: 2.5rem;
         font-weight: 500;
         margin-bottom: 5px;
@@ -61,7 +57,7 @@
     .login-form p {
         font-size: 1rem;
         color: #555;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
 
     .form-group {
@@ -71,7 +67,7 @@
     .form-group label {
         display: block;
         font-weight: bold;
-        color: #D32F2F; /* Màu đỏ */
+        color: #D32F2F;
         margin-bottom: 8px;
         font-size: 0.9rem;
     }
@@ -81,14 +77,14 @@
         padding: 12px 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
-        box-sizing: border-box; /* Quan trọng để padding không làm vỡ layout */
+        box-sizing: border-box;
         font-size: 1rem;
     }
 
     .btn-signin {
         width: 100%;
         padding: 12px;
-        background-color: #D7B0B0; /* Màu nút mờ như trong ảnh */
+        background-color: #D7B0B0;
         color: white;
         border: none;
         border-radius: 5px;
@@ -99,7 +95,18 @@
     }
 
     .btn-signin:hover {
-        background-color: #C08E8E; /* Màu đậm hơn khi hover */
+        background-color: #C08E8E;
+    }
+
+    /* CSS cho thông báo lỗi */
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        text-align: center;
+        border: 1px solid #f5c6cb;
     }
   </style>
 </head>
@@ -112,19 +119,27 @@
       <h2>Login</h2>
       <p>Login to your account.</p>
 
-      <form action="/login" method="POST">
+      <div th:if="${param.error}" class="alert-error">
+        <span style="font-weight: bold;">⚠️ Đăng nhập thất bại!</span><br>
+        Sai tên đăng nhập hoặc mật khẩu.
+      </div>
+
+      <form th:action="@{/login}" method="POST" th:object="${user}">
         <div class="form-group">
           <label for="username">E-mail Address or Username</label>
-
-          <input type="text" id="username" name="username" required>
+          <input type="text" id="username" th:field="*{username}" required placeholder="admin">
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" required>
+          <input type="password" id="password" th:field="*{password}" required placeholder="123456">
         </div>
 
         <button type="submit" class="btn-signin">Sign In</button>
+
+        <div style="margin-top: 15px; text-align: center;">
+          <a href="/viewRegister" style="color: #555; text-decoration: none;">Create an account</a>
+        </div>
       </form>
     </div>
   </div>

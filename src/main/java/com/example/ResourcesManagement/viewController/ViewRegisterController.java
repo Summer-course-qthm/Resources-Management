@@ -35,6 +35,6 @@ public class ViewRegisterController {
     public String  registerUser(@ModelAttribute("user") CreateUserRequestDTO  user) {
         userService.createUser(user);
 
-        return "login";
+        return "redirect:/viewLogin?registerSuccess";
     }
 }

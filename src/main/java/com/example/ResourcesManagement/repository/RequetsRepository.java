@@ -13,10 +13,14 @@ import java.util.Optional;
 public interface RequetsRepository  extends JpaRepository<RequestEntity , Long> {
     List<RequestEntity> findByStatus(String status);
 
+    // Hàm tìm thiết bị đầu tiên theo loại và trạng thái
     Optional<DevicesEntity> findFirstByDeviceTypeAndStatus(String deviceType, String status);
 
+    // Hàm kiểm tra xem user đã gửi yêu cầu cùng loại thiết bị chưa
     boolean existsByDeviceTypeAndRequestingUser(String deviceType, UserEntity userEntity);
 
     // Hàm đếm số lượng request theo trạng thái
     long countByStatus(String status);
+
+    List<RequestEntity> findByRequestingUserId(Long id);
 }

@@ -31,4 +31,6 @@ public interface DeviceRepository  extends JpaRepository<DevicesEntity,Long> {
 
     boolean existsByDeviceTypeAndAssignedUser(String deviceType, UserEntity user);
 
+    // Đếm số lượng thiết bị 'assigned' cho user X thuộc loại Y
+    int countByAssignedUserIdAndDeviceTypeAndStatus(Long id, String deviceType, String assigned);
 }

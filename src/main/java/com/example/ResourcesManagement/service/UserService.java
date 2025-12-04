@@ -37,6 +37,14 @@ public class UserService implements UserDetailsService { // <-- THAY ĐỔI 1: i
     @Autowired
     private ChapterRepository chapterRepository;
 
+    // Trong UserService.java
+
+    // Hàm lấy thông tin user đầy đủ (để check role)
+    public UserEntity getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     public String  createUser(CreateUserRequestDTO createUserRequestDTO) {
         if (userRepository.findByUsername(createUserRequestDTO.getUsername()).isPresent()) {
             throw new RuntimeException("Username already exists");
