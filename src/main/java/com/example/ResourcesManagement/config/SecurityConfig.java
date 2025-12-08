@@ -63,7 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/chapter/**", "/chapters/**").hasRole("ADMIN")
 
                         // Quản lý yêu cầu (Duyệt/Từ chối)
-                        .requestMatchers("/viewRequests").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/viewRequests").hasRole("ADMIN")
                         .requestMatchers("/api/request/**").hasRole("ADMIN") // Các API duyệt, từ chối, check-stock
 
                         // Checklist
