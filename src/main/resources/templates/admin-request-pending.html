@@ -2,117 +2,176 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Danh sách yêu cầu mượn thiết bị</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý yêu cầu thiết bị | NNT Software</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { background-color: #f8f9fa; overflow: hidden; }
-        #sidebar-wrapper { min-height: 100vh; margin-left: -15rem; transition: margin .25s ease-out; background-color: #0d6efd; }
-        #sidebar-wrapper .sidebar-heading { padding: 1.5rem 1.25rem; font-size: 1.2rem; font-weight: bold; color: white; border-bottom: 1px solid rgba(255,255,255,0.2); }
-        #sidebar-wrapper .list-group { width: 15rem; }
-        #sidebar-wrapper .list-group-item { background-color: #0d6efd; color: rgba(255,255,255,0.8); border: none; padding: 1rem 1.25rem; }
-        #sidebar-wrapper .list-group-item:hover, #sidebar-wrapper .list-group-item.active {
-            background-color: rgba(255,255,255,0.2); color: #fff; border-left: 4px solid white; font-weight: 600;
+        :root { --primary-color: #0d6efd; --sidebar-width: 260px; }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+
+        /* Sidebar Styling */
+        #wrapper { display: flex; width: 100%; align-items: stretch; }
+        #sidebar-wrapper {
+            min-width: var(--sidebar-width); max-width: var(--sidebar-width);
+            background-color: var(--primary-color); color: white;
+            transition: all 0.3s; min-height: 100vh;
         }
-        #page-content-wrapper { width: 100%; overflow-y: auto; height: 100vh; }
-        @media (min-width: 768px) { #sidebar-wrapper { margin-left: 0; } }
-        .badge-action { cursor: pointer; padding: 8px 12px; font-size: 0.85rem; }
+        #sidebar-wrapper.toggled { margin-left: calc(-1 * var(--sidebar-width)); }
+
+        .sidebar-heading { padding: 1.5rem; font-size: 1.3rem; font-weight: bold; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .list-group-item {
+            background-color: transparent; color: rgba(255,255,255,0.85); border: none; padding: 12px 20px;
+            display: flex; align-items: center; text-decoration: none; transition: all 0.2s;
+        }
+        .list-group-item:hover { background-color: rgba(255,255,255,0.1); color: #fff; padding-left: 25px; }
+        .list-group-item.active { background-color: white; color: var(--primary-color); font-weight: 600; border-radius: 5px 0 0 5px; margin-left: 10px; }
+
+        /* Main Content Styling */
+        #page-content-wrapper { width: 100%; }
+        .navbar { background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); background: white; }
+        .table thead th { background-color: #f8f9fa; border-bottom: 2px solid #e9ecef; color: #6c757d; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+
+        /* Avatar */
+        .avatar-initial { width: 35px; height: 35px; background-color: #e9ecef; color: var(--primary-color); display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; margin-right: 10px; }
+
+        /* Buttons */
+        .btn-action { padding: 5px 10px; font-size: 0.8rem; border-radius: 6px; transition: 0.2s; }
+        .btn-action:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
 <div class="d-flex" id="wrapper">
 
-    <!-- Sidebar -->
-    <div class="border-end" id="sidebar-wrapper">
-        <div class="sidebar-heading"><i class="fa-brands fa-nfc-symbol me-2"></i>NNT Software</div>
-        <div class="list-group list-group-flush">
-            <a href="/dashboardController" class="list-group-item list-group-item-action">
-                <i class="fa-solid fa-house me-2"></i> Dashboard
+    <div id="sidebar-wrapper">
+        <div class="sidebar-heading">
+            <i class="fa-brands fa-nfc-symbol me-2"></i>NNT Soft
+        </div>
+        <div class="list-group list-group-flush mt-3">
+            <a href="/dashboardController" class="list-group-item"><i class="fa-solid fa-chart-pie me-3" style="width: 20px"></i> Dashboard</a>
+            <a href="/viewDevices" class="list-group-item"><i class="fa-solid fa-laptop me-3" style="width: 20px"></i> Thiết bị</a>
+            <a href="/viewEmployees" class="list-group-item"><i class="fa-solid fa-users me-3" style="width: 20px"></i> Nhân viên</a>
+            <a href="/viewDepartments" class="list-group-item"><i class="fa-solid fa-building me-3" style="width: 20px"></i> Phòng ban</a>
+            <a href="/viewRequests" class="list-group-item active">
+                <i class="fa-solid fa-clipboard-check me-3" style="width: 20px"></i> Yêu cầu
+                <span th:if="${requestDeviceCount > 0}" th:text="${requestDeviceCount}" class="badge bg-danger rounded-pill ms-auto shadow-sm"></span>
             </a>
-            <a href="/viewDevices" class="list-group-item list-group-item-action">
-                <i class="fa-solid fa-laptop me-2"></i> Thiết bị
-            </a>
-            <a href="/viewEmployees" class="list-group-item list-group-item-action">
-                <i class="fa-solid fa-users me-2"></i> Nhân viên
-            </a>
-            <a href="/viewDepartments" class="list-group-item list-group-item-action">
-                <i class="fa-solid fa-building me-2"></i> Phòng ban
-            </a>
-            <a href="/viewRequests" class="list-group-item list-group-item-action active">
-                <i class="fa-solid fa-clipboard-check me-2"></i> Yêu cầu
-            </a>
-            <a href="/logout" class="list-group-item list-group-item-action mt-auto border-top border-white-50">
-                <i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất
-            </a>
+            <a href="/logout" class="list-group-item mt-auto text-danger-emphasis"><i class="fa-solid fa-power-off me-3" style="width: 20px"></i> Đăng xuất</a>
         </div>
     </div>
 
-    <!-- Main content -->
     <div id="page-content-wrapper">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3">
-            <h2 class="fs-4 m-0 text-secondary">Danh sách yêu cầu mượn thiết bị</h2>
-        </nav>
 
-        <div class="container py-4">
-
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-
-                    <table class="table table-hover align-middle">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nhân viên</th>
-                            <th>Loại thiết bị</th>
-                            <th>Mô tả</th>
-                            <th>Ngày tạo</th>
-                            <th>Trạng thái</th>
-                            <th class="text-end">Hành động</th>
-                        </tr>
-                        </thead>
-
-                        <tbody>
-                        <tr th:each="req : ${listRequest}">
-                            <td th:text="${req.id}">1</td>
-                            <td th:text="${req.userName}">Nguyễn Văn A</td>
-                            <td th:text="${req.deviceType}">Laptop</td>
-                            <td th:text="${req.description}">Làm dự án</td>
-                            <td th:text="${req.createdAt}">2025-12-01</td>
-
-                            <td>
-                                <span class="badge bg-warning text-dark">Chờ duyệt</span>
-                            </td>
-
-                            <td class="text-end d-flex justify-content-end gap-2">
-                                <form th:action="@{/admin/request/approve}" method="post">
-                                    <input type="hidden" name="requestId" th:value="${req.id}">
-                                    <button class="badge bg-success badge-action border-0">
-                                        <i class="fa-solid fa-check me-1"></i> Duyệt
-                                    </button>
-                                </form>
-
-                                <form th:action="@{/admin/request/reject}" method="post">
-                                    <input type="hidden" name="requestId" th:value="${req.id}">
-                                    <button class="badge bg-danger badge-action border-0">
-                                        <i class="fa-solid fa-xmark me-1"></i> Từ chối
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-
-                        </tbody>
-
-                    </table>
-
+        <nav class="navbar navbar-expand-lg navbar-light px-4 py-3">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-light border me-3" id="menu-toggle"><i class="fas fa-bars"></i></button>
+                <h4 class="m-0 fw-bold text-secondary">Danh sách yêu cầu mượn</h4>
+            </div>
+            <div class="ms-auto d-flex align-items-center">
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none text-dark dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="admin" width="32" height="32" class="rounded-circle me-2">
+                        <strong>Admin</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+                        <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                    </ul>
                 </div>
             </div>
+        </nav>
 
+        <div class="container-fluid px-4 py-4">
+
+            <div class="card card-custom">
+                <div class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-primary"><i class="fa-solid fa-list-ul me-2"></i>Yêu cầu đang chờ</h5>
+                </div>
+
+                <div class="card-body p-0">
+
+                    <div th:if="${#lists.isEmpty(listRequest)}" class="text-center py-5">
+                        <p class="text-muted fw-bold">Hiện không có yêu cầu nào đang chờ duyệt.</p>
+                    </div>
+
+                    <div th:unless="${#lists.isEmpty(listRequest)}" class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                            <tr>
+                                <th class="ps-4">ID</th>
+                                <th>Nhân viên</th>
+                                <th>Thiết bị</th>
+                                <th>Lý do mượn</th>
+                                <th>Trạng thái</th>
+                                <th class="text-end pe-4">Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="req : ${listRequest}">
+                                <td class="ps-4 fw-bold text-muted" th:text="'#' + ${req.id}">#1</td>
+
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-initial"
+                                             th:text="${req.user != null ? #strings.substring(req.user.username,0,1) : '?'}">A</div>
+                                        <span class="fw-medium"
+                                              th:text="${req.user != null ? req.user.username : 'Unknown'}">Nguyễn Văn A</span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                        <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25"
+                                              th:text="${req.deviceType}">Laptop</span>
+                                </td>
+                                <td class="text-secondary" th:text="${req.description}">Làm dự án</td>
+
+                                <td>
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fa-regular fa-clock me-1"></i>Chờ duyệt
+                                        </span>
+                                </td>
+
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+
+                                        <a th:href="@{/admin/request/process/{id}(id=${req.id})}"
+                                           class="btn btn-success btn-sm btn-action"
+                                           title="Kiểm tra & Bàn giao">
+                                            <i class="fa-solid fa-clipboard-check me-1"></i> Kiểm tra
+                                        </a>
+
+                                        <form th:action="@{/admin/request/reject}" method="post"
+                                              onsubmit="return confirm('Bạn có chắc chắn muốn TỪ CHỐI yêu cầu này?');">
+                                            <input type="hidden" name="requestId" th:value="${req.id}">
+                                            <button type="submit" class="btn btn-danger btn-sm btn-action" title="Từ chối">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    var el = document.getElementById("wrapper");
+    var toggleButton = document.getElementById("menu-toggle");
+
+    toggleButton.onclick = function () {
+        el.classList.toggle("toggled");
+    };
+</script>
 
 </body>
 </html>

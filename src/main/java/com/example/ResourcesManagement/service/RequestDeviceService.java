@@ -59,7 +59,7 @@ public class RequestDeviceService {
                     .build();
 
             return RequestResponseDTO.builder()
-                    .requestId(requestEntity.getRequestId())
+                    .id(requestEntity.getRequestId())
                     .user(userResponseDTO)
                     .deviceType(requestEntity.getDeviceType())
                     .description(requestEntity.getDescription())
@@ -230,7 +230,7 @@ public class RequestDeviceService {
                     .build();
 
             return RequestResponseDTO.builder()
-                    .requestId(requestEntity.getRequestId())
+                    .id(requestEntity.getRequestId())
                     .user(userResponseDTO)
                     .deviceType(requestEntity.getDeviceType())
                     .description(requestEntity.getDescription())
@@ -239,4 +239,22 @@ public class RequestDeviceService {
         }).toList();
     }
 
+    public RequestResponseDTO getRequestById(Long requestId) {
+        RequestEntity requestEntity = requetsRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+        UserEntity userEntity = requestEntity.getRequestingUser();
+        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+                .id(userEntity.getId())
+                .username(userEntity.getUsername())
+                .chapterName(userEntity.getChapter() != null ? userEntity.getChapter().getName() : null)
+                .build();
+        return RequestResponseDTO.builder()
+                .id(requestEntity.getRequestId())
+                .user(userResponseDTO)
+                .deviceType(requestEntity.getDeviceType())
+                .description(requestEntity.getDescription())
+                .status(requestEntity.getStatus())
+                .build();
+
+    }
 }

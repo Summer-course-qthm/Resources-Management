@@ -5,32 +5,55 @@ import com.example.ResourcesManagement.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface DeviceRepository  extends JpaRepository<DevicesEntity,Long> {
+public interface DeviceRepository extends JpaRepository<DevicesEntity, Long> {
+
+    // 1. Tìm danh sách thiết bị đang được gán cho user ID cụ thể
     List<DevicesEntity> findByAssignedUserId(Long userId);
 
-    Optional <DevicesEntity> findByDeviceName(String deviceName);
+    // 2. Tìm thiết bị theo tên chính xác
+    Optional<DevicesEntity> findByDeviceName(String deviceName);
 
-
+    // 3. Tìm thiết bị ĐẦU TIÊN khớp loại và trạng thái (trả về 1 cái hoặc null)
     Optional<DevicesEntity> findFirstByDeviceTypeAndStatus(String deviceType, String status);
 
-    boolean existsByStatusAndDeviceType(String status , String deviceType);
+    // 4. Kiểm tra sự tồn tại (trả về true/false)
+    boolean existsByStatusAndDeviceType(String status, String deviceType);
 
-    // kiểm tra 1 người chửi đc mượn 1 devicetype và status available
+    // 5. Kiểm tra logic nghiệp vụ: Người này có đang mượn loại máy này với trạng thái này không
     boolean existsByAssignedUserIdAndDeviceTypeAndStatus(Long userId, String deviceType, String status);
 
-    // THÊM PHƯƠNG THỨC NÀY: Tìm kiếm theo tên HOẶC loại (có chứa từ khóa)
+    // 6. Tìm kiếm cho thanh Search (Tìm theo tên HOẶC loại)
     List<DevicesEntity> findByDeviceNameContainingIgnoreCaseOrDeviceTypeContainingIgnoreCase(String name, String type);
 
-    // Tìm thiết bị đầu tiên có trạng thái 'available' và đúng loại
+    // 7. Tìm thiết bị đầu tiên (Dùng để auto-assign nếu cần)
     Optional<DevicesEntity> findFirstByStatusAndDeviceType(String status, String deviceType);
 
+    // 8. Kiểm tra user có giữ loại máy này không
     boolean existsByDeviceTypeAndAssignedUser(String deviceType, UserEntity user);
 
-    // Đếm số lượng thiết bị 'assigned' cho user X thuộc loại Y
+    // 9. Đếm số lượng
     int countByAssignedUserIdAndDeviceTypeAndStatus(Long id, String deviceType, String assigned);
+
+    // =========================================================================
+    // PHẦN BỔ SUNG ĐỂ CHẠY ĐƯỢC CONTROLLER "PROCESS REQUEST"
+    // =========================================================================
+
+//    /**
+//     * CÁCH 1: Tìm theo TÊN thiết bị (chứa từ khóa) và Trạng thái.
+//     * Dùng cái này nếu trong Controller bạn gọi: findByDeviceNameContainingAndStatus
+//     */
+// Tìm chính xác loại máy (VD: "Laptop") và đang rảnh (AVAILABLE)
+
+        List<DevicesEntity> findByDeviceTypeAndStatus(String deviceType, String status);
+
+//    /**
+//     * CÁCH 2 (KHUYÊN DÙNG): Tìm chính xác theo LOẠI thiết bị và Trạng thái.
+//     * Ví dụ: Tìm tất cả "Laptop" đang "AVAILABLE".
+//     * Nếu dùng cái này, nhớ sửa Controller thành: findByDeviceTypeAndStatus
+//     */
+    List<DevicesEntity> findByDeviceTypeAndStatus(String deviceType, String status);
 }

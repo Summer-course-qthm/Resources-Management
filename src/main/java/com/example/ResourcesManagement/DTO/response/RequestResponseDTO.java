@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class RequestResponseDTO {
-    private Long requestId;
+    private Long id;
     private String deviceType;
     private String description;
     private String status;
