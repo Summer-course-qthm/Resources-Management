@@ -50,10 +50,5 @@ public interface DeviceRepository extends JpaRepository<DevicesEntity, Long> {
 
         List<DevicesEntity> findByDeviceTypeAndStatus(String deviceType, String status);
 
-//    /**
-//     * CÁCH 2 (KHUYÊN DÙNG): Tìm chính xác theo LOẠI thiết bị và Trạng thái.
-//     * Ví dụ: Tìm tất cả "Laptop" đang "AVAILABLE".
-//     * Nếu dùng cái này, nhớ sửa Controller thành: findByDeviceTypeAndStatus
-//     */
-    List<DevicesEntity> findByDeviceTypeAndStatus(String deviceType, String status);
+//
 }

@@ -91,6 +91,7 @@
             <input type="hidden" name="requestId" th:value="${req.id}">
 
             <div class="row">
+
               <div class="col-md-4">
                 <div class="p-3 bg-light rounded border h-100">
                   <h6 class="text-secondary fw-bold mb-3">Yêu cầu từ nhân viên</h6>
@@ -128,29 +129,45 @@
                       </td>
                       <td th:text="${dev.deviceName}" class="fw-bold text-primary">Dell Latitude</td>
                       <td><span class="badge bg-secondary" th:text="${dev.deviceId}">#001</span></td>
-                      <td th:text="${dev.description}" class="small text-muted">Core i5, 8GB RAM</td>
+                      <td class="small text-muted" th:text="${dev.note}">Mô tả...</td>
                     </tr>
                     </tbody>
                   </table>
                 </div>
 
-                <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-list-check me-2"></i>Kiểm tra phụ kiện & Tình trạng</h6>
+                <h6 class="fw-bold text-primary mb-2">
+                  <i class="fa-solid fa-list-check me-2"></i>Các hạng mục kiểm tra
+                  <small class="text-muted fw-normal">(Áp dụng cho: <span th:text="${req.deviceType}"></span>)</small>
+                </h6>
+
                 <div class="card card-body bg-light border-0 mb-3">
-                  <div class="d-flex flex-wrap gap-4">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="checkCharger" name="hasCharger">
-                      <label class="form-check-label" for="checkCharger">Kèm Sạc / Nguồn</label>
+
+                  <div th:if="${#lists.isEmpty(checklistItems)}" class="text-muted small fst-italic mb-2">
+                    <i class="fa-solid fa-circle-info me-1"></i> Chưa có mẫu kiểm tra cho loại thiết bị này.
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6" th:each="item : ${checklistItems}">
+                      <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox"
+                               name="checkedItems"
+                               th:value="${item.itemDescription}"
+                               th:id="'check_' + ${item.itemId}">
+
+                        <label class="form-check-label"
+                               th:for="'check_' + ${item.itemId}"
+                               th:text="${item.itemDescription}">
+                          Tên mục kiểm tra
+                        </label>
+                      </div>
                     </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="checkMouse" name="hasMouse">
-                      <label class="form-check-label" for="checkMouse">Kèm Chuột / Phụ kiện</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="checkCondition" required>
-                      <label class="form-check-label fw-bold text-success" for="checkCondition">
-                        <i class="fa-solid fa-check me-1"></i>Thiết bị hoạt động tốt
-                      </label>
-                    </div>
+                  </div>
+
+                  <div class="form-check border-top pt-2 mt-2">
+                    <input class="form-check-input" type="checkbox" id="checkCondition" required>
+                    <label class="form-check-label fw-bold text-success" for="checkCondition">
+                      <i class="fa-solid fa-check me-1"></i>Xác nhận thiết bị hoạt động tốt
+                    </label>
                   </div>
                 </div>
 

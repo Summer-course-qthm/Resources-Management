@@ -3,14 +3,10 @@ package com.example.ResourcesManagement.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-// User Entity
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Table(name = "checklist_items")
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor @Builder
+@Table(name = "checklist_items") // Bảng này chứa: "Sạc", "Chuột", "Cáp HDMI"...
 public class ChecklistItemEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,14 +14,9 @@ public class ChecklistItemEntity {
     private Long itemId;
 
     @Column(name = "item_description")
-    private String itemDescription;
+    private String itemDescription; // Tên mục: "Sạc pin kèm theo"
 
-    // thêm mục đã check hay chưa
-    @Column(name = "is_checked")
-    private Boolean isChecked;
-
-    // Nhiều mục con thuộc về một Checklist
-
+    // Liên kết ngược về bảng cha (ChecklistEntity)
     @ManyToOne
     @JoinColumn(name = "checklist_id")
     private ChecklistEntity checklist;

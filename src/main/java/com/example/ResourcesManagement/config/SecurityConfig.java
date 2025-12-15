@@ -65,9 +65,13 @@ public class SecurityConfig {
                         // Quản lý yêu cầu (Duyệt/Từ chối)
                         .requestMatchers(HttpMethod.GET,"/viewRequests").hasRole("ADMIN")
                         .requestMatchers("/api/request/**").hasRole("ADMIN") // Các API duyệt, từ chối, check-stock
+                        .requestMatchers(HttpMethod.POST ,"/api/request/approve").hasRole("ADMIN")
 
                         // Checklist
                         .requestMatchers("/checklist/**", "/checkListItem/**").hasRole("ADMIN")
+
+                        // Quản lý thông báo
+                        .requestMatchers("/my-notifications").hasAnyRole("ADMIN" , "USER")
 
                         // === 5. MẶC ĐỊNH: BẮT BUỘC ĐĂNG NHẬP ===
                         .anyRequest().authenticated()

@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CheckListRepository extends JpaRepository<ChecklistEntity,Long> {
+
+    ChecklistEntity findByDeviceType(String deviceType);
 }

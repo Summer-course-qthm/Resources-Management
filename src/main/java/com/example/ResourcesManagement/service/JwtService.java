@@ -18,7 +18,7 @@ public class JwtService {
     // Tối thiểu 256 bit, tương đương 32 ký tự an toàn (encoded Base64)
     private static final String SECRET_KEY = "VGhlUXVpY2tCcm93bkZveEp1bXBzT3ZlckxvY2FsSG9zdA==";
 
-    // ... code còn lại của bạn
+
 
     // Phương thức helper để tạo key từ chuỗi bí mật
     private Key getSignInKey() {

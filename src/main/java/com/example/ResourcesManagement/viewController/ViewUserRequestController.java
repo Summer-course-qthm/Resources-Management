@@ -1,9 +1,11 @@
 package com.example.ResourcesManagement.viewController;
 
 import com.example.ResourcesManagement.DTO.request.ResquestDeviceDTO;
+import com.example.ResourcesManagement.DTO.response.NotificationResponseDTO;
 import com.example.ResourcesManagement.DTO.response.RequestResponseDTO;
 import com.example.ResourcesManagement.entity.UserEntity;
 import com.example.ResourcesManagement.repository.UserRepository;
+import com.example.ResourcesManagement.service.NotificationService;
 import com.example.ResourcesManagement.service.RequestDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -24,6 +26,9 @@ public class ViewUserRequestController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    NotificationService notificationService;
 
     // --- 1. HIỂN THỊ FORM (Tạo Model trước theo ý bạn) ---
     @GetMapping("/request-device")
@@ -75,5 +80,23 @@ public class ViewUserRequestController {
         model.addAttribute("myRequests", myRequests);
 
         return "my-requests"; // Trả về my-requests.html
+    }
+
+
+    // hiển thị thông báo của user
+    @GetMapping("/my-notifications")
+    public String viewNotifications(Model model) {
+        // 1. Lấy User đang đăng nhập
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserEntity currentUser = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 2. Gọi Service lấy dữ liệu THẬT từ DB
+        List<NotificationResponseDTO> notifications = notificationService.getMyNotifications(currentUser.getId());
+
+        // 3. Đẩy ra view
+        model.addAttribute("notifications", notifications);
+
+        return "my-notifications";
     }
 }

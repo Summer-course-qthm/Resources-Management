@@ -8,7 +8,6 @@
 
   <style>
     body { background-color: #f8f9fa; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
-    /* Sidebar Styles */
     #sidebar-wrapper { min-height: 100vh; margin-left: -15rem; transition: margin .25s ease-out; background-color: #0d6efd; }
     #sidebar-wrapper .sidebar-heading { padding: 1.5rem 1.25rem; font-size: 1.2rem; font-weight: bold; color: white; border-bottom: 1px solid rgba(255,255,255,0.2); }
     #sidebar-wrapper .list-group { width: 15rem; }
@@ -91,7 +90,8 @@
               </thead>
               <tbody>
               <tr th:each="req : ${myRequests}">
-                <td class="ps-4 fw-bold text-muted" th:text="'#' + ${req.requestId}">#123</td>
+
+                <td class="ps-4 fw-bold text-muted" th:text="'#' + ${req.id}">#123</td>
 
                 <td>
                   <span class="badge bg-light text-dark border px-3 py-2" th:text="${req.deviceType}">Laptop</span>
@@ -105,17 +105,17 @@
                 </td>
 
                 <td class="text-center">
-                                    <span th:if="${req.status == 'PENDING'}" class="badge bg-warning text-dark shadow-sm">
-                                        <i class="fa-solid fa-hourglass-half me-1"></i> Chờ duyệt
-                                    </span>
+                    <span th:if="${req.status == 'PENDING'}" class="badge bg-warning text-dark shadow-sm">
+                        <i class="fa-solid fa-hourglass-half me-1"></i> Chờ duyệt
+                    </span>
 
                   <span th:if="${req.status == 'APPROVED'}" class="badge bg-success shadow-sm">
-                                        <i class="fa-solid fa-check-circle me-1"></i> Đã duyệt
-                                    </span>
+                        <i class="fa-solid fa-check-circle me-1"></i> Đã duyệt
+                    </span>
 
                   <span th:if="${req.status == 'REJECTED'}" class="badge bg-danger shadow-sm">
-                                        <i class="fa-solid fa-circle-xmark me-1"></i> Từ chối
-                                    </span>
+                        <i class="fa-solid fa-circle-xmark me-1"></i> Từ chối
+                    </span>
                 </td>
               </tr>
               </tbody>
