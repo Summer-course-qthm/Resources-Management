@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/viewRequests").hasRole("ADMIN")
                         .requestMatchers("/api/request/**").hasRole("ADMIN") // Các API duyệt, từ chối, check-stock
                         .requestMatchers(HttpMethod.POST ,"/api/request/approve").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST ,"/admin/request/reject").hasRole("ADMIN")
 
                         // Checklist
                         .requestMatchers("/checklist/**", "/checkListItem/**").hasRole("ADMIN")

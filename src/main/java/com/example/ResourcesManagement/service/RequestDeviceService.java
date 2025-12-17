@@ -115,7 +115,7 @@ public class RequestDeviceService {
     }
 
     // API từ chối thủ công
-    public void rejectRequestManual(Long requestId, Long adminId) {
+    public void rejectRequestManual(Long requestId) {
         RequestEntity request = requetsRepository.findById(requestId).orElseThrow();
         rejectRequestLogic(request, "Admin đã từ chối yêu cầu này.");
     }
@@ -180,4 +180,6 @@ public class RequestDeviceService {
                 .status(entity.getStatus())
                 .build();
     }
+
+
 }

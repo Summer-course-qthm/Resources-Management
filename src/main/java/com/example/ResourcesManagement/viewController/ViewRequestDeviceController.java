@@ -89,5 +89,12 @@ public class ViewRequestDeviceController {
     }
 
     //từ chối yêu cầu
+    @PostMapping("/admin/request/reject")
+    public String rejectRequest(@RequestParam("requestId") Long requestId){
 
+        // Gọi Service xử lý
+        requestDeviceService.rejectRequestManual(requestId);
+
+        return "redirect:/viewRequests?success";
+    }
 }
