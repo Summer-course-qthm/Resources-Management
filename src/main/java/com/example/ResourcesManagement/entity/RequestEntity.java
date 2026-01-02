@@ -31,4 +31,8 @@ public class RequestEntity {
     @ManyToOne
     @JoinColumn(name = "approve_user_id" )
     private UserEntity approvingUser; // người duyệt request
+
+    @ManyToOne
+    @JoinColumn(name = "device_id") // Tạo cột device_id trong bảng requests để liên kết
+    private DevicesEntity device;
 }

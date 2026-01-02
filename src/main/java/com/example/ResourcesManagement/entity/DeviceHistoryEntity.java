@@ -22,7 +22,7 @@ public class DeviceHistoryEntity {
     // Loại hành động: "BORROW" (Mượn), "RETURN" (Trả), "MAINTENANCE" (Bảo trì)
     // Nên đặt nullable = false để không bao giờ bị null
     @Column(name = "action", nullable = false, length = 50)
-    private String action;
+    private String action; // lưu lịch sử mượn / trả
 
     @Column(nullable = false)
     private LocalDateTime actionDate; // Ngày giờ thực hiện

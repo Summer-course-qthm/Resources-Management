@@ -25,4 +25,5 @@ public class ViewLogOutController {
         // 5. Chuyển hướng về trang đăng nhập
         return "redirect:/viewLogin";
     }
+
 }

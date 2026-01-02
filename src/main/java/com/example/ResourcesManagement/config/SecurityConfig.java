@@ -74,6 +74,9 @@ public class SecurityConfig {
                         // Quản lý thông báo
                         .requestMatchers("/my-notifications").hasAnyRole("ADMIN" , "USER")
 
+                        //Trả thiết bị
+                        .requestMatchers(HttpMethod.GET ,"/admin/borrowed-devices").hasRole("ADMIN")
+
                         // === 5. MẶC ĐỊNH: BẮT BUỘC ĐĂNG NHẬP ===
                         .anyRequest().authenticated()
                 )

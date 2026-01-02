@@ -9,12 +9,8 @@ import java.util.List;
 @Repository
 public interface DeviceHistoryRepository extends JpaRepository<DeviceHistoryEntity, Long> {
 
-    // --- DÒNG ĐÚNG (Đã sửa) ---
-    // Spring sẽ tìm thuộc tính 'device' -> rồi tìm tiếp 'deviceId' bên trong nó
-    List<DeviceHistoryEntity> findByDeviceDeviceIdOrderByActionDateDesc(Long deviceId);
+    // Tìm lịch sử theo Device (Admin xem máy này đã qua tay ai)
+    List<DeviceHistoryEntity> findByDeviceIdOrderByActionDateDesc(Long deviceId);
 
-    // --- CÁC HÀM KHÁC ---
-    List<DeviceHistoryEntity> findByUserIdOrderByActionDateDesc(Long userId);
-
-    List<DeviceHistoryEntity> findByAction(String action);
+    List<DeviceHistoryEntity> findAllByOrderByActionDateDesc();
 }

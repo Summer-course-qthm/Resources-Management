@@ -15,19 +15,24 @@ import java.util.List;
 @Service
 public class RequestDeviceService {
 
-    @Autowired UserRepository userRepository;
-    @Autowired RequetsRepository requetsRepository;
-    @Autowired DeviceRepository deviceRepository;
-    @Autowired DeviceHistoryRepository deviceHistoryRepository;
-    @Autowired NotificationRepository notificationRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private RequetsRepository requetsRepository;
+    @Autowired
+    private DeviceRepository deviceRepository;
+    @Autowired
+    private DeviceHistoryRepository deviceHistoryRepository;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     // --- 1. USER GỬI YÊU CẦU ---
     public String addRequest(ResquestDeviceDTO request) {
-        UserEntity User = userRepository.findById(request.getUserId())
+        UserEntity user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         RequestEntity requestEntity = RequestEntity.builder()
-                .requestingUser(User)
+                .requestingUser(user)
                 .deviceType(request.getDeviceType())
                 .description(request.getDescription())
                 .status("PENDING")
@@ -37,23 +42,43 @@ public class RequestDeviceService {
         return "Request added successfully";
     }
 
-    // --- 2. LẤY DANH SÁCH PENDING ---
+    // --- 2. CÁC HÀM LẤY DANH SÁCH ---
+
+    // Lấy danh sách chờ duyệt (PENDING)
     public List<RequestResponseDTO> getAllRequest() {
-        List<RequestEntity> requestEntities = requetsRepository.findByStatus("PENDING");
-        return convertToDTOList(requestEntities);
+        return convertToDTOList(requetsRepository.findByStatus("PENDING"));
     }
 
-    // --- 3. LOGIC DUYỆT & BÀN GIAO (Hàm CHÍNH thức) ---
-    // (Đã xóa hàm approveRequest cũ thừa thãi đi)
+    // [QUAN TRỌNG] Lấy cả PENDING và APPROVED (Để Admin vừa duyệt vừa trả máy)
+    public List<RequestResponseDTO> getAllManageableRequests() {
+        // Cần thêm hàm findByStatusIn trong Repository nếu chưa có
+        // Hoặc dùng tạm logic này nếu repo chưa hỗ trợ IN
+        List<RequestEntity> pending = requetsRepository.findByStatus("PENDING");
+        List<RequestEntity> approved = requetsRepository.findByStatus("APPROVED");
+        pending.addAll(approved);
+        return convertToDTOList(pending);
+    }
+
+    // Lấy danh sách theo trạng thái cụ thể (Dùng cho trang "Đang mượn")
+    public List<RequestResponseDTO> getRequestsByStatus(String status) {
+        return convertToDTOList(requetsRepository.findByStatus(status));
+    }
+
+    // --- 3. LOGIC DUYỆT & BÀN GIAO (Hoàn chỉnh) ---
     @Transactional(rollbackFor = Exception.class)
     public void approveAndAssignDevice(Long requestId, Long selectedDeviceId,
-                                       List<String> checkedItems, String adminNote) {
+                                       List<String> checkedItems, String adminNote,
+                                       Long adminId) { // [1] Nhận thêm ID của Admin
 
-        // 1. Tìm Request & Device
+        // 1. Tìm Request, Device và Admin
         RequestEntity request = requetsRepository.findById(requestId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu (ID: " + requestId + ")"));
+
         DevicesEntity device = deviceRepository.findById(selectedDeviceId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy thiết bị"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thiết bị (ID: " + selectedDeviceId + ")"));
+
+        UserEntity adminUser = userRepository.findById(adminId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy Admin (ID: " + adminId + ")"));
 
         // 2. Xử lý Checklist (List -> String)
         String checklistResult;
@@ -63,19 +88,19 @@ public class RequestDeviceService {
             checklistResult = "Đã kiểm tra: " + String.join(", ", checkedItems);
         }
 
-        // 3. Lưu Lịch sử (History)
+        // 3. Lưu Lịch sử (History) - ACTION: BORROW
         DeviceHistoryEntity history = DeviceHistoryEntity.builder()
                 .action("BORROW")
                 .actionDate(LocalDateTime.now())
                 .device(device)
-                .user(request.getRequestingUser())
-                // .handler(adminUser) // Thêm admin nếu có
+                .user(request.getRequestingUser()) // Người mượn
+                .handler(adminUser)                // [2] Người xử lý là Admin
                 .checklistResult(checklistResult)
                 .note(adminNote)
                 .build();
         deviceHistoryRepository.save(history);
 
-        // 4. Cập nhật Device
+        // 4. Cập nhật trạng thái Device
         device.setStatus("assigned");
         device.setAssignedUser(request.getRequestingUser());
         deviceRepository.save(device);
@@ -83,9 +108,16 @@ public class RequestDeviceService {
         // 5. Cập nhật Request
         request.setStatus("APPROVED");
         request.setNameDevice(device.getDeviceName());
+
+        // [QUAN TRỌNG] Lưu liên kết thiết bị để sau này trả máy
+        request.setDevice(device);
+
+        // [QUAN TRỌNG] Lưu người duyệt đơn này
+        request.setApprovingUser(adminUser);
+
         requetsRepository.save(request);
 
-        // 6. Gửi Thông báo cho User (Lấy từ hàm cũ sang)
+        // 6. Gửi Thông báo cho User
         NotificationEntity notification = NotificationEntity.builder()
                 .title("Yêu cầu được duyệt ✅")
                 .message("Bạn đã được cấp thiết bị: " + device.getDeviceName())
@@ -95,55 +127,92 @@ public class RequestDeviceService {
                 .build();
         notificationRepository.save(notification);
     }
+    // --- 4. LOGIC TRẢ THIẾT BỊ (Thu hồi) ---
+    @Transactional(rollbackFor = Exception.class)
+    public void returnDevice(Long requestId, String condition, String note) {
+        // 1. Tìm lại yêu cầu mượn gốc
+        RequestEntity request = requetsRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu id: " + requestId));
 
-    // --- 4. CÁC HÀM TIỆN ÍCH KHÁC (Giữ nguyên) ---
+        // Kiểm tra trạng thái hợp lệ
+        if (!"APPROVED".equals(request.getStatus()) && !"BORROWED".equals(request.getStatus())) {
+            throw new RuntimeException("Yêu cầu này không hợp lệ để trả máy (Status: " + request.getStatus() + ")");
+        }
 
-    // Hàm từ chối (Tự động hoặc Thủ công dùng chung)
-    private void rejectRequestLogic(RequestEntity request, String reason) {
-        request.setStatus("REJECTED");
-        request.setDescription(request.getDescription() + " | Lý do: " + reason);
+        // 2. Lấy thông tin thiết bị từ yêu cầu
+        DevicesEntity device = request.getDevice();
+        if (device == null) {
+            throw new RuntimeException("Lỗi dữ liệu: Yêu cầu này chưa được liên kết với thiết bị nào!");
+        }
+
+        // 3. Cập nhật trạng thái Yêu cầu -> Đã trả (RETURNED)
+        request.setStatus("RETURNED");
         requetsRepository.save(request);
 
-        NotificationEntity notification = NotificationEntity.builder()
-                .title("Yêu cầu bị từ chối ❌")
-                .message("Lý do: " + reason)
+        // 4. Cập nhật trạng thái Thiết bị -> Về kho hoặc Bảo trì
+        if ("DAMAGED".equalsIgnoreCase(condition) || "LOST".equalsIgnoreCase(condition)) {
+            device.setStatus("MAINTENANCE");
+        } else {
+            device.setStatus("available");
+        }
+        device.setAssignedUser(null); // Gỡ người dùng ra
+        deviceRepository.save(device);
+
+        // 5. Ghi Lịch sử (History) - ACTION: RETURN
+        DeviceHistoryEntity history = DeviceHistoryEntity.builder()
+                .device(device)
                 .user(request.getRequestingUser())
+                .action("RETURN")
+                .actionDate(LocalDateTime.now())
+                .checklistResult(condition) // Tình trạng trả
+                .note(note) // Ghi chú phạt/hỏng
+                .build();
+        deviceHistoryRepository.save(history);
+
+        // 6. Gửi thông báo
+        createNotification(request.getRequestingUser(), "Trả thiết bị thành công ✅",
+                "Bạn đã hoàn tất trả thiết bị: " + device.getDeviceName());
+    }
+
+    // --- CÁC HÀM TIỆN ÍCH KHÁC ---
+
+    // Hàm tạo thông báo chung
+    private void createNotification(UserEntity user, String title, String message) {
+        NotificationEntity notification = NotificationEntity.builder()
+                .title(title)
+                .message(message)
+                .user(user)
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationRepository.save(notification);
     }
 
-    // API từ chối thủ công
+    // Từ chối yêu cầu (Thủ công)
     public void rejectRequestManual(Long requestId) {
         RequestEntity request = requetsRepository.findById(requestId).orElseThrow();
-        rejectRequestLogic(request, "Admin đã từ chối yêu cầu này.");
+
+        request.setStatus("REJECTED");
+        request.setDescription(request.getDescription() + " | Admin đã từ chối.");
+        requetsRepository.save(request);
+
+        createNotification(request.getRequestingUser(), "Yêu cầu bị từ chối ❌",
+                "Admin đã từ chối yêu cầu của bạn.");
     }
 
-    // Pre-check (Có thể giữ lại để dùng sau nếu cần check kho tự động)
-    public String preCheckRequest(Long requestId) {
+    // Từ chối kèm lý do (Nếu bạn dùng Modal nhập lý do)
+    public void rejectRequest(Long requestId, String reason) {
         RequestEntity request = requetsRepository.findById(requestId).orElseThrow();
-        boolean hasStock = deviceRepository.existsByStatusAndDeviceType("available", request.getDeviceType());
-        if (!hasStock) {
-            return "REJECTED_NO_STOCK";
-        }
-        return "OK";
+
+        request.setStatus("REJECTED");
+        requetsRepository.save(request);
+
+        createNotification(request.getRequestingUser(), "Yêu cầu bị từ chối ❌",
+                "Lý do: " + reason);
     }
 
     public void deleteRequest(Long id) {
         requetsRepository.deleteById(id);
-    }
-
-    @Transactional
-    public String returnDevice(Long deviceId, Long userId) {
-        DevicesEntity device = deviceRepository.findById(deviceId).orElseThrow();
-        // ... Logic trả máy giữ nguyên ...
-        // (Lưu ý: Bạn nên thêm logic lưu History RETURN vào đây giống hàm approve)
-
-        device.setStatus("available");
-        device.setAssignedUser(null);
-        deviceRepository.save(device);
-        return "Device returned successfully.";
     }
 
     public long countRequestDevices() {
@@ -159,7 +228,7 @@ public class RequestDeviceService {
         return convertSingleDTO(requestEntity);
     }
 
-    // --- Helper: Convert Entity to DTO (Để code đỡ lặp lại) ---
+    // --- Helper: Convert Entity to DTO ---
     private List<RequestResponseDTO> convertToDTOList(List<RequestEntity> entities) {
         return entities.stream().map(this::convertSingleDTO).toList();
     }
@@ -178,8 +247,8 @@ public class RequestDeviceService {
                 .deviceType(entity.getDeviceType())
                 .description(entity.getDescription())
                 .status(entity.getStatus())
+                // [ĐÃ SỬA] Thêm dòng này để fix lỗi Thymeleaf "nameDevice cannot be found"
+                .nameDevice(entity.getNameDevice())
                 .build();
     }
-
-
 }

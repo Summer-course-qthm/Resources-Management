@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Danh sách đang mượn | NNT Software</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root { --primary-color: #0d6efd; --sidebar-width: 260px; }
+    body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+
+    /* Sidebar Styling */
+    #wrapper { display: flex; width: 100%; align-items: stretch; }
+    #sidebar-wrapper {
+        min-width: var(--sidebar-width); max-width: var(--sidebar-width);
+        background-color: var(--primary-color); color: white;
+        transition: all 0.3s; min-height: 100vh;
+    }
+    #sidebar-wrapper.toggled { margin-left: calc(-1 * var(--sidebar-width)); }
+
+    .sidebar-heading { padding: 1.5rem; font-size: 1.3rem; font-weight: bold; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .list-group-item {
+        background-color: transparent; color: rgba(255,255,255,0.85); border: none; padding: 12px 20px;
+        display: flex; align-items: center; text-decoration: none; transition: all 0.2s;
+    }
+    .list-group-item:hover { background-color: rgba(255,255,255,0.1); color: #fff; padding-left: 25px; }
+    .list-group-item.active { background-color: white; color: var(--primary-color); font-weight: 600; border-radius: 5px 0 0 5px; margin-left: 10px; }
+
+    /* Main Content Styling */
+    #page-content-wrapper { width: 100%; }
+    .navbar { background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); background: white; }
+    .table thead th { background-color: #f8f9fa; border-bottom: 2px solid #e9ecef; color: #6c757d; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; }
+
+    /* Avatar */
+    .avatar-initial { width: 35px; height: 35px; background-color: #e9ecef; color: var(--primary-color); display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; margin-right: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="d-flex" id="wrapper">
+
+  <div id="sidebar-wrapper">
+    <div class="sidebar-heading">
+      <i class="fa-brands fa-nfc-symbol me-2"></i>NNT Soft
+    </div>
+    <div class="list-group list-group-flush mt-3">
+      <a href="/dashboardController" class="list-group-item"><i class="fa-solid fa-chart-pie me-3" style="width: 20px"></i> Dashboard</a>
+      <a href="/viewDevices" class="list-group-item"><i class="fa-solid fa-laptop me-3" style="width: 20px"></i> Thiết bị</a>
+      <a href="/viewEmployees" class="list-group-item"><i class="fa-solid fa-users me-3" style="width: 20px"></i> Nhân viên</a>
+      <a href="/viewDepartments" class="list-group-item"><i class="fa-solid fa-building me-3" style="width: 20px"></i> Phòng ban</a>
+      <a href="/viewRequests" class="list-group-item active">
+        <i class="fa-solid fa-clipboard-check me-3" style="width: 20px"></i> Quản lý mượn trả
+      </a>
+      <a href="/logout" class="list-group-item mt-auto text-danger-emphasis"><i class="fa-solid fa-power-off me-3" style="width: 20px"></i> Đăng xuất</a>
+    </div>
+  </div>
+
+  <div id="page-content-wrapper">
+
+    <nav class="navbar navbar-expand-lg navbar-light px-4 py-3">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-light border me-3" id="menu-toggle"><i class="fas fa-bars"></i></button>
+        <h4 class="m-0 fw-bold text-secondary">Danh sách thiết bị đang cho mượn</h4>
+      </div>
+      <div class="ms-auto d-flex align-items-center">
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center text-decoration-none text-dark dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="admin" width="32" height="32" class="rounded-circle me-2">
+            <strong>Admin</strong>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid px-4 py-4">
+
+      <a href="/viewRequests" class="btn btn-outline-secondary btn-sm mb-3">
+        <i class="fa-solid fa-arrow-left me-2"></i>Quay lại danh sách yêu cầu
+      </a>
+
+      <div class="card card-custom">
+        <div class="card-header bg-white py-3 border-bottom-0">
+          <h5 class="mb-0 fw-bold text-primary"><i class="fa-solid fa-list-check me-2"></i>Thiết bị đang sử dụng</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+              <tr>
+                <th class="ps-4">Mã YC</th>
+                <th>Người mượn</th>
+                <th>Thiết bị đang giữ</th>
+                <th>Ngày mượn</th>
+                <th class="text-end pe-4">Hành động</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="req : ${borrowedList}">
+                <td class="ps-4 fw-bold text-muted" th:text="'#' + ${req.id}">#123</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar-initial" th:text="${req.user != null ? #strings.substring(req.user.username,0,1) : '?'}">A</div>
+                    <div class="ms-2">
+                      <div class="fw-bold" th:text="${req.user.username}">Nguyễn Văn A</div>
+                      <small class="text-muted" th:text="${req.user.chapterName}">IT Dept</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25"
+                                          th:text="${req.deviceType}">Laptop Dell</span>
+                  <div class="small text-muted mt-1" th:if="${req.nameDevice}">
+                    <i class="fa-solid fa-tag me-1"></i><span th:text="${req.nameDevice}">Dell 7490</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="text-secondary"><i class="fa-regular fa-calendar me-1"></i>Hôm nay</span>
+                </td>
+                <td class="text-end pe-4">
+                  <button type="button" class="btn btn-warning btn-sm fw-bold text-dark"
+                          data-bs-toggle="modal"
+                          data-bs-target="#returnChecklistModal"
+                          th:data-id="${req.id}"
+                          th:data-username="${req.user.username}"
+                          onclick="setReturnId(this.getAttribute('data-id'), this.getAttribute('data-username'))">
+                    <i class="fa-solid fa-rotate-left me-1"></i> Thu hồi
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="returnChecklistModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form th:action="@{/admin/request/return}" method="post">
+        <div class="modal-header bg-warning">
+          <h5 class="modal-title fw-bold text-dark">
+            <i class="fa-solid fa-clipboard-check me-2"></i>Kiểm tra & Thu hồi
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <input type="hidden" name="requestId" id="returnRequestId">
+
+          <p>Đang thu hồi thiết bị từ: <strong id="returnUserName" class="text-primary">...</strong></p>
+
+          <div class="card bg-light border-0 mb-3">
+            <div class="card-body py-2">
+              <h6 class="fw-bold border-bottom pb-2 mb-2 small text-uppercase text-muted">Kiểm tra phụ kiện & Tình trạng</h6>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="checkCharger">
+                <label class="form-check-label" for="checkCharger">Đầy đủ sạc/cáp nguồn</label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="checkMouse">
+                <label class="form-check-label" for="checkMouse">Chuột / Phụ kiện đi kèm</label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="checkScreen">
+                <label class="form-check-label" for="checkScreen">Màn hình không nứt vỡ</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkClean">
+                <label class="form-check-label" for="checkClean">Máy sạch sẽ, không dính keo</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Kết luận trạng thái:</label>
+            <select name="condition" class="form-select border-warning" required>
+              <option value="GOOD" selected>✅ Tốt - Trả về kho (Available)</option>
+              <option value="DAMAGED">⚠️ Hư hỏng - Cần bảo trì (Maintenance)</option>
+              <option value="LOST">❌ Mất mát (Lost)</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Ghi chú thêm (Nếu hỏng hoặc thiếu đồ):</label>
+            <textarea name="note" class="form-control" rows="2" placeholder="Ví dụ: Thiếu chuột, trầy xước nhẹ..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary fw-bold">Xác nhận Đã Trả</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Logic Toggle Sidebar
+  var el = document.getElementById("wrapper");
+  var toggleButton = document.getElementById("menu-toggle");
+
+  toggleButton.onclick = function () {
+      el.classList.toggle("toggled");
+  };
+
+  // Logic gán dữ liệu vào Modal khi bấm nút Thu hồi (Cách an toàn)
+  function setReturnId(id, username) {
+      document.getElementById('returnRequestId').value = id;
+      document.getElementById('returnUserName').innerText = username;
+
+      // Reset checkbox mỗi khi mở lại modal
+      document.querySelectorAll('.form-check-input').forEach(chk => chk.checked = false);
+  }
+</script>
+
+</body>
+</html>
